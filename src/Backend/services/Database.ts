@@ -13,7 +13,7 @@ class DatabaseConnection {
 
     try {
       await this.#client.connect();
-      this.db = this.#client.db("sample_mflix");
+      this.db = this.#client.db("Application");
     } catch (error) {
       console.error(error);
     }
