@@ -46,7 +46,7 @@ function Home() {
   return (
     <>
       <main className="w-screen min-h-screen flex">
-        <aside className="bg-[#131313] w-60 h-screen px-5 pt-5 gap-10 flex flex-col">
+        <aside className="bg-[#131313] w-60 min-h-screen px-5 pt-5 gap-10 flex flex-col">
           <div>
             <h1 className="text-[#CCFF00] italic text-xl ">KINETIC</h1>
             <p className="text-[#ADAAAA] text-[8px]">ELITE PERFORMANCE</p>
@@ -204,7 +204,7 @@ function Home() {
             </GlowingButton>
           )}
         </aside>
-        <section className="bg-[#0E0E0E] w-full h-screen">
+        <section className="bg-[#0E0E0E] w-full min-h-full pb-10">
           {activePanelElement}
         </section>
       </main>

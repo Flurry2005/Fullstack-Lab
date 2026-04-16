@@ -80,6 +80,35 @@ class UserController {
 
     return res.status(404).json({ succes: false, error: "User not found!" });
   }
+  async getSessions(req: Request<{}, {}, any>, res: Response) {
+    const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
+    if (await Database.db.collection("users").findOne({ _id: userId })) {
+      const workouts = await Database.db
+        .collection("sessions")
+        .find({
+          userId: res.locals.jwt.userId,
+        })
+        .toArray();
+      return res.status(200).json({ success: true, data: workouts });
+    }
+
+    return res.status(404).json({ succes: false, error: "User not found!" });
+  }
+
+  async addSession(req: Request<{}, {}, any>, res: Response) {
+    const { workoutId, date } = req.body;
+    const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
+    if (await Database.db.collection("users").findOne({ _id: userId })) {
+      await Database.db.collection("sessions").insertOne({
+        userId: res.locals.jwt.userId,
+        workoutId: workoutId,
+        date: new Date(date),
+      });
+      return res.status(200).json({ success: true, data: "Session added" });
+    }
+
+    return res.status(404).json({ succes: false, error: "User not found!" });
+  }
 }
 
 type LoginBody = {

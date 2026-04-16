@@ -20,3 +20,10 @@ router.post(
 router.get("/get-workouts", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
   userController.getWorkouts(req, res);
 });
+router.get("/get-sessions", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
+  userController.getSessions(req, res);
+});
+
+router.post("/add-session", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
+  userController.addSession(req, res);
+});

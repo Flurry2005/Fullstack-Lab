@@ -52,9 +52,7 @@ function WorkoutsPanel() {
             <p className="text-[#ADAAAA]">
               {activePanel === Panel.CREATE
                 ? "Create and customize your own workouts."
-                : "Push past your limits. Review every set, every rep, and every" +
-                  <br /> +
-                  "PR recorded in your journey to peak performance."}
+                : "Push past your limits. Review every set, every rep, and every \n PR recorded in your journey to peak performance."}
             </p>
           </aside>
           <div className="w-3/10 h-full flex gap-5 justify-end items-end">

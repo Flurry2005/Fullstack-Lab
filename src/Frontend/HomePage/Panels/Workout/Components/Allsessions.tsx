@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
+import { getSessions } from "../Scripts/GetSessions";
+import type { Workout } from "../../../../types/Workout";
 
 function Allsessions() {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
-  const [workouts, setWorkouts] = useState();
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
+
+  const [sessions, setSessions] = useState([]);
 
   const openWorkoutSelector = async () => {
     const res = await getWorkouts();
@@ -15,12 +19,43 @@ function Allsessions() {
     }
   };
 
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const fetchSessions = async () => {
+    const res1 = await getWorkouts();
+    if (res1.success) {
+      setWorkouts(res1.data);
+    }
+    const res = await getSessions();
+
+    if (res.success) {
+      setSessions(res.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchSessions();
+  }, []);
+
   return (
     <div className="flex gap-10">
       <GlowingButton
         outline={false}
         onClick={() => openWorkoutSelector()}
-        additionalClasses="rounded-full! w-15! h-15! text-black! text-7xl font-light! absolute right-10 bottom-10 cursor-pointer"
+        additionalClasses="rounded-full! w-15! h-15! text-black! text-7xl font-light! fixed right-10 bottom-10 cursor-pointer"
       >
         <img src="PlusIcon.png" alt="" />
       </GlowingButton>
@@ -59,9 +94,44 @@ function Allsessions() {
         </div>
       </article>
       {/* Session Section */}
-      <section className="flex-1"></section>
+      <section className="flex-1 flex flex-col gap-5">
+        {sessions.map((session: Session) => {
+          const workout = workouts.find((w) => w._id === session.workoutId);
+          const d = new Date(session.date);
+
+          const day = d.getDate();
+          const month = monthNames[d.getMonth()];
+          return (
+            <div className="bg-[#131313] p-5 rounded-2xl flex gap-5 items-center">
+              <div className="flex flex-col text-white w-10 items-center">
+                <p className="text-3xl font-black">{day}</p>
+                <p className="text-xs text-[#ADAAAA]">{month.toUpperCase()}</p>
+              </div>
+              <span className="h-10 border-r-2 border-[#484847]/10 min-w-1"></span>
+              <div>
+                <p className="text-4xl text-white font-black tracking-tighter">
+                  {workout?.workoutName ?? "Unknown workout"}
+                </p>
+                <p className="text-xs text-[#ADAAAA]">Temporary</p>
+              </div>
+              {/*Tags */}
+              <div className="flex flex-col justify-center items-end flex-1">
+                {workout?.tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 text-xs bg-[#1A1A1A] text-white rounded-3xl w-fit"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </section>
       {workoutSelectorOpen && (
         <WorkoutSelector
+          updateSessions={fetchSessions}
           closeSelector={openWorkoutSelector}
           workouts={workouts}
         />
@@ -69,5 +139,12 @@ function Allsessions() {
     </div>
   );
 }
+
+type Session = {
+  _id: string;
+  userId: string;
+  workoutId: string;
+  date: Date;
+};
 
 export default Allsessions;
