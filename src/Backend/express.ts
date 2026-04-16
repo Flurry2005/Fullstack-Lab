@@ -2,17 +2,17 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import { mainRouter } from "./routes/index.ts";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(express.urlencoded({extended: true}))
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 app.set("trust proxy", 1);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-];
+const allowedOrigins = ["http://localhost:5173"];
 
 app.use(
   cors({
@@ -29,4 +29,4 @@ app.use(
   }),
 );
 
-app.use(mainRouter)
+app.use(mainRouter);
