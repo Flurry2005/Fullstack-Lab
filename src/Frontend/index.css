@@ -5,3 +5,8 @@
 @theme {
   --font-sans: "Lexend", sans-serif;
 }
+
+html {
+    overflow: scroll;
+    overflow-x: hidden;
+}

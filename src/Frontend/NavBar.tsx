@@ -5,16 +5,28 @@ function NavBar() {
   const { user, logout } = useAuth();
   return (
     <>
-      <header className="flex justify-between px-10 pt-3">
+      <header className="flex justify-between px-10 pt-3 h-10">
         <h2 className="text-[#CCFF00] text-l ">KINETIC EDGE</h2>
-        <nav>
+        <nav className="flex gap-4 items-center">
           {user ? (
-            <button
-              onClick={logout}
-              className="bg-red-600 rounded-2xl text-xs w-15 h-7"
-            >
-              Logout
-            </button>
+            <>
+              <img
+                src="notificationIcon.png"
+                alt=""
+                className="h-5 cursor-pointer"
+              />
+              <img
+                src="settingsIcon.png"
+                alt=""
+                className="h-5 cursor-pointer"
+              />
+              <button
+                onClick={logout}
+                className="bg-[#FF7441] rounded-2xl text-xs w-15 h-7 text-white font-bold"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               to={"/login"}
