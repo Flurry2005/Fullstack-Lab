@@ -27,3 +27,10 @@ router.get("/get-sessions", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
 router.post("/add-session", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
   userController.addSession(req, res);
 });
+router.patch(
+  "/update-session",
+  jwtMiddleware.jwtTokenIsValid,
+  (req, res, next) => {
+    userController.updateSession(req, res);
+  },
+);

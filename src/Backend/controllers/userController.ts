@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 import userModel from "../models/userModel.ts";
 import workoutModel from "../models/workoutModel.ts";
 import sessionModel from "../models/sessionModel.ts";
+import type { Session } from "../../Frontend/types/Session.ts";
 
 class UserController {
   async login(req: Request<{}, {}, LoginBody>, res: Response) {
@@ -104,6 +105,19 @@ class UserController {
 
     return res.status(404).json({ succes: false, error: "User not found!" });
   }
+  async updateSession(req: Request<{}, {}, UpdateSessionBody>, res: Response) {
+    const { session } = req.body;
+    const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
+    const user = await userModel.GetUser({ _id: userId });
+    if (user && res.locals.jwt.userId === session.userId) {
+      await sessionModel.updateSession({
+        session,
+      });
+      return res.status(200).json({ success: true, data: "Session updated" });
+    }
+
+    return res.status(404).json({ succes: false, error: "User not found!" });
+  }
 }
 
 type LoginBody = {
@@ -119,6 +133,9 @@ type RegisterBody = {
 type WorkoutBody = {
   workoutName: string;
   tags?: [];
+};
+type UpdateSessionBody = {
+  session: Session;
 };
 
 export default new UserController();

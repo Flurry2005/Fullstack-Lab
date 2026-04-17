@@ -1,11 +1,11 @@
 import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
 import { act, useEffect, useState, type JSX } from "react";
-import Allsessions from "./Components/Allsessions";
+import UpcommingSessions from "./Components/UpcommingSessions";
 import CreateWorkout from "./Components/CreateWorkout";
+import PastSessions from "./Components/PastSessions";
 
 export const Panel = {
-  ALLSESSIONS: "ALLSESSIONS",
   PAST: "PAST",
   UPCOMMING: "UPCOMMING",
   CREATE: "CREATE",
@@ -14,24 +14,26 @@ export const Panel = {
 export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 
 function WorkoutsPanel() {
-  const [activePanel, setActivePanel] = useState<ActivePanel>(
-    Panel.ALLSESSIONS,
-  );
+  const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.UPCOMMING);
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
-    <Allsessions />,
+    <UpcommingSessions />,
   );
   useEffect(() => {
     switch (activePanel) {
-      case Panel.ALLSESSIONS: {
-        setActivePanelElement(<Allsessions />);
+      case Panel.UPCOMMING: {
+        setActivePanelElement(<UpcommingSessions />);
         break;
       }
       case Panel.CREATE: {
         setActivePanelElement(<CreateWorkout />);
         break;
       }
+      case Panel.PAST: {
+        setActivePanelElement(<PastSessions />);
+        break;
+      }
       default: {
-        setActivePanelElement(<Allsessions />);
+        setActivePanelElement(<UpcommingSessions />);
       }
     }
   }, [activePanel]);
@@ -71,15 +73,15 @@ function WorkoutsPanel() {
             <GlowingButton
               outline={false}
               onClick={() => {
-                setActivePanel(Panel.ALLSESSIONS);
+                setActivePanel(Panel.UPCOMMING);
               }}
               additionalClasses={`bg-none font-black tracking-tighter text-xs w-30! h-8! !rounded-2xl ${
-                activePanel === Panel.ALLSESSIONS
+                activePanel === Panel.UPCOMMING
                   ? "bg-[#F3FFCA] !text-[#516700]"
                   : "bg-[#1A1A1A] !text-[#ADAAAA]"
               }`}
             >
-              All Sessions
+              Upcomming
             </GlowingButton>
 
             <GlowingButton
@@ -94,19 +96,6 @@ function WorkoutsPanel() {
               }`}
             >
               Past
-            </GlowingButton>
-            <GlowingButton
-              outline={false}
-              onClick={() => {
-                setActivePanel(Panel.UPCOMMING);
-              }}
-              additionalClasses={`bg-none font-black tracking-tighter text-xs w-30! h-8! !rounded-2xl ${
-                activePanel === Panel.UPCOMMING
-                  ? "bg-[#F3FFCA] !text-[#516700]"
-                  : "bg-[#1A1A1A] !text-[#ADAAAA]"
-              }`}
-            >
-              Upcomming
             </GlowingButton>
             <GlowingButton
               outline={false}
