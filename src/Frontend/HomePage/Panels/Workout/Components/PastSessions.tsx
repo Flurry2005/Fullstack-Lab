@@ -4,7 +4,8 @@ import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
 import { getSessions } from "../Scripts/GetSessions";
 import type { Workout } from "../../../../types/Workout";
-import Session from "./Session";
+import SessionCard from "./SessionCard";
+import type { Session } from "../../../../types/Session.ts";
 
 function PastSessions() {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
@@ -160,12 +161,12 @@ function PastSessions() {
           const month = monthNames[d.getMonth()];
           const year = d.getFullYear();
           return (
-            <Session
+            <SessionCard
               session={session}
               day={day.toString()}
               month={month}
               year={year.toString()}
-              workoutName={workout?.workoutName!}
+              workout={workout!}
               tags={workout?.tags!}
             />
           );

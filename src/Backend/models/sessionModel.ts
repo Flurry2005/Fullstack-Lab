@@ -11,11 +11,15 @@ class SessionModel {
     workoutId: string;
     date: Date;
   }) {
+    const workout = await Database.db
+      .collection("workouts")
+      .findOne({ _id: new ObjectId(workoutId) });
     return await Database.db.collection("sessions").insertOne({
       userId: userId,
       workoutId: workoutId,
       completed: false,
       date: new Date(date),
+      exercices: workout!.exercices,
     });
   }
   async updateSession({ session }: { session: Session }) {
@@ -24,6 +28,7 @@ class SessionModel {
       {
         $set: {
           completed: session.completed,
+          exercices: session.exercices,
         },
       },
     );

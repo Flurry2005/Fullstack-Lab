@@ -1,3 +1,4 @@
+import type { Exercice } from "../../Frontend/types/Exercice.ts";
 import Database from "../services/Database.ts";
 
 class WorkoutModel {
@@ -5,15 +6,18 @@ class WorkoutModel {
     userId,
     workoutName,
     tags,
+    exercices,
   }: {
     userId: string;
     workoutName: string;
     tags: string[];
+    exercices: Exercice[];
   }) {
     return await Database.db.collection("workouts").insertOne({
       userId: userId,
       workoutName: workoutName,
       tags: tags,
+      exercices: exercices,
     });
   }
   async GetWorkouts({ userId }: { userId: string }) {

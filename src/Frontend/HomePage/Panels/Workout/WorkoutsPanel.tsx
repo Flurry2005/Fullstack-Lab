@@ -1,9 +1,11 @@
 import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
-import { act, useEffect, useState, type JSX } from "react";
+import { act, use, useEffect, useState, type JSX } from "react";
 import UpcommingSessions from "./Components/UpcommingSessions";
-import CreateWorkout from "./Components/CreateWorkout";
+import CreateWorkout from "./Components/Create/CreateWorkout";
 import PastSessions from "./Components/PastSessions";
+import { getExercices } from "./Scripts/GetExercices";
+import type { Exercice } from "../../../types/Exercice";
 
 export const Panel = {
   PAST: "PAST",
@@ -18,14 +20,24 @@ function WorkoutsPanel() {
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
     <UpcommingSessions />,
   );
+  const [exercices, setExercices] = useState<Exercice[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await getExercices();
+      setExercices(res.data);
+    })();
+  }, []);
+
   useEffect(() => {
     switch (activePanel) {
       case Panel.UPCOMMING: {
+        exercices;
         setActivePanelElement(<UpcommingSessions />);
         break;
       }
       case Panel.CREATE: {
-        setActivePanelElement(<CreateWorkout />);
+        setActivePanelElement(<CreateWorkout exercices={exercices} />);
         break;
       }
       case Panel.PAST: {
@@ -38,35 +50,37 @@ function WorkoutsPanel() {
     }
   }, [activePanel]);
   return (
-    <div>
+    <div className="">
       <NavBar></NavBar>
-      <main className="flex flex-col px-10 gap-10 h-full pt-10 w-full">
-        <section className="flex justify-between mx-10 overflow-hidden h-50 relative min-h-fit">
-          <aside className="w-7/10 h-fuil flex flex-col gap-5">
-            <p className="text-[#F3FFCA] text-xs">
+      <main className="flex flex-col px-10 gap-10 h-full pt-10 w-full ">
+        <section className="flex flex-col md:flex-row justify-between md:mx-10 overflow-hidden h-50 relative min-h-fit gap-5">
+          <aside className="w-9/10 md:w-full h-full flex flex-col md:gap-5">
+            <p className="text-[#F3FFCA] text-xs w-min wrap-normal">
               {activePanel === Panel.CREATE
                 ? "MAKE A WORKOUT"
                 : "TRAINING HISTORY"}
             </p>
-            <h2 className="text-white text-7xl font-black">
+            <h2 className="text-white text-7xl font-black w-min flex-wrap">
               {activePanel === Panel.CREATE ? "CREATE WORKOUT" : "SESSION LOGS"}
             </h2>
-            <p className="text-[#ADAAAA]">
-              {activePanel === Panel.CREATE
-                ? "Create and customize your own workouts."
-                : "Push past your limits. Review every set, every rep, and every \n PR recorded in your journey to peak performance."}
-            </p>
+            <div className="flex md:flex-row flex-col justify-between md:gap-20 gap-5 w-full">
+              <p className="text-[#ADAAAA] w-fit wrap-break-word">
+                {activePanel === Panel.CREATE
+                  ? "Create and customize your own workouts."
+                  : "Push past your limits. Review every set, every rep, and every \n PR recorded in your journey to peak performance."}
+              </p>
+              <div className="md:w-3/10 h-full flex gap-5 justify-center md:justify-end items-end">
+                <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
+                  <h2 className="text-[#ADAAAA] text-xs">THIS MONTH</h2>
+                  <p className="text-[#F3FFCA] font-black text-xl">24</p>
+                </article>
+                <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
+                  <h2 className="text-[#ADAAAA] text-xs">STREAK</h2>
+                  <p className="text-[#FF7441] font-black text-xl">12d</p>
+                </article>
+              </div>
+            </div>
           </aside>
-          <div className="w-3/10 h-full flex gap-5 justify-end items-end">
-            <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
-              <h2 className="text-[#ADAAAA] text-xs">THIS MONTH</h2>
-              <p className="text-[#F3FFCA] font-black text-xl">24</p>
-            </article>
-            <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
-              <h2 className="text-[#ADAAAA] text-xs">STREAK</h2>
-              <p className="text-[#FF7441] font-black text-xl">12d</p>
-            </article>
-          </div>
         </section>
         <section>
           <div className="w-full h-20 bg-[#131313] rounded-2xl flex items-center px-5 gap-5">

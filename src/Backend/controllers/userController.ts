@@ -6,6 +6,7 @@ import userModel from "../models/userModel.ts";
 import workoutModel from "../models/workoutModel.ts";
 import sessionModel from "../models/sessionModel.ts";
 import type { Session } from "../../Frontend/types/Session.ts";
+import type { Exercice } from "../../Frontend/types/Exercice.ts";
 
 class UserController {
   async login(req: Request<{}, {}, LoginBody>, res: Response) {
@@ -55,13 +56,14 @@ class UserController {
       .json({ succes: true, data: "Account successfully registered!" });
   }
   async createWorkout(req: Request<{}, {}, WorkoutBody>, res: Response) {
-    const { workoutName, tags } = req.body;
+    const { workoutName, tags, exercices } = req.body;
     const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
     if (await userModel.GetUser({ _id: userId })) {
       await workoutModel.CreateWorkout({
         userId: res.locals.jwt.userId,
         workoutName: workoutName,
         tags: tags!,
+        exercices: exercices,
       });
       return res.status(200).json({ success: true, data: "Workout Created" });
     }
@@ -133,6 +135,7 @@ type RegisterBody = {
 type WorkoutBody = {
   workoutName: string;
   tags?: [];
+  exercices: Exercice[];
 };
 type UpdateSessionBody = {
   session: Session;

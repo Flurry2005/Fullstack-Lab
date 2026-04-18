@@ -1,4 +1,10 @@
-export async function createWorkout(workoutName: string, tags: string[]) {
+import type { Exercice } from "../../../../types/Exercice";
+
+export async function createWorkout(
+  workoutName: string,
+  tags: string[],
+  exercices: Exercice[],
+) {
   if (workoutName.trim() === "" || workoutName.trim().length <= 2) {
     //invalid formats
     console.error("Invalid workout name");
@@ -11,7 +17,7 @@ export async function createWorkout(workoutName: string, tags: string[]) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ workoutName: workoutName, tags }),
+      body: JSON.stringify({ workoutName: workoutName, tags, exercices }),
       credentials: "include",
     });
 

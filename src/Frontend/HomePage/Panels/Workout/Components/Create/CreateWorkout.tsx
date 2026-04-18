@@ -1,9 +1,16 @@
-import React, { useState } from "react";
-import InputField from "../../../../Components/General/InputField";
-import { createWorkout } from "../Scripts/CreateWorkout";
-import GlowingButton from "../../../../Components/General/GlowingButton";
+import { useState } from "react";
+import InputField from "../../../../../Components/General/InputField";
+import { createWorkout } from "../../Scripts/CreateWorkout";
+import GlowingButton from "../../../../../Components/General/GlowingButton";
+import Exercise from "./Exercise";
+import type { Exercice } from "../../../../../types/Exercice";
 
-function CreateWorkout() {
+interface Props {
+  exercices: Exercice[];
+}
+
+function CreateWorkout({ exercices }: Props) {
+  const [selectedExercices, setSelectedExercices] = useState<Exercice[]>([]);
   const [tags, setTags] = useState<string[]>([]);
 
   return (
@@ -15,7 +22,11 @@ function CreateWorkout() {
 
           const workoutName = formData.get("workoutName")?.toString();
 
-          const res = await createWorkout(workoutName!, tags);
+          const res = await createWorkout(
+            workoutName!,
+            tags,
+            selectedExercices,
+          );
 
           if (res.success) {
           }
@@ -34,6 +45,7 @@ function CreateWorkout() {
           required={true}
           additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
         ></InputField>
+        {/* Tags */}
         <p className="text-white">Tags</p>
         <div className="flex gap-5">
           <GlowingButton
@@ -94,6 +106,15 @@ function CreateWorkout() {
             Legs
           </GlowingButton>
         </div>
+
+        {/* Exercices */}
+        <p className="text-white">Exercices</p>
+        <Exercise
+          exercices={exercices}
+          selectedExercices={selectedExercices}
+          setSelectedExercices={setSelectedExercices}
+        ></Exercise>
+
         <GlowingButton
           outline={false}
           onClick={() => {}}

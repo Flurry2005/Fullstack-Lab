@@ -19,7 +19,7 @@ type DateType = {
 function WorkoutSelector({ closeSelector, updateSessions, workouts }: Props) {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-[#131313] p-6 w-6/10 h-8/10 rounded-xl relative overflow-scroll overflow-x-hidden">
+      <div className="bg-[#131313] p-6 h-9/10 w-9/10 md:w-6/10 md:h-8/10 rounded-xl relative overflow-scroll overflow-x-hidden">
         <button
           onClick={closeSelector}
           className="absolute top-2 right-2 text-white cursor-pointer"

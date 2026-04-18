@@ -45,8 +45,8 @@ function Home() {
 
   return (
     <>
-      <main className="w-screen min-h-screen flex">
-        <aside className="bg-[#131313] w-60 min-h-screen px-5 pt-5 gap-10 flex flex-col">
+      <main className="w-screen min-h-screen flex flex-col md:flex-row">
+        <aside className="bg-[#131313] md:w-60 md:min-h-screen px-5 pt-5 gap-10 flex flex-col">
           <div>
             <h1 className="text-[#CCFF00] italic text-xl ">KINETIC</h1>
             <p className="text-[#ADAAAA] text-[8px]">ELITE PERFORMANCE</p>
@@ -198,7 +198,7 @@ function Home() {
             <GlowingButton
               outline={false}
               onClick={() => setActivePanel(Panel.WORKOUTS)}
-              additionalClasses="bg-none bg-[#CAFD00] font-black tracking-tighter text-xs !text-[#4A5E00]"
+              additionalClasses="bg-none bg-[#CAFD00] font-black tracking-tighter text-xs !text-[#4A5E00] self-center mb-5 md:m-0"
             >
               + LOG NEW WORKOUT
             </GlowingButton>

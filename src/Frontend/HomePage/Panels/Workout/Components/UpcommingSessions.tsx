@@ -4,7 +4,8 @@ import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
 import { getSessions } from "../Scripts/GetSessions";
 import type { Workout } from "../../../../types/Workout";
-import Session from "./Session";
+import SessionCard from "./SessionCard.tsx";
+import type { Session } from "../../../../types/Session.ts";
 
 function UpcommingSessions() {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
@@ -79,7 +80,7 @@ function UpcommingSessions() {
       >
         <img src="PlusIcon.png" alt="" />
       </GlowingButton>
-      <article className="w-80 h-100 rounded-2xl bg-[#131313] overflow-hidden relative">
+      <article className="hidden xl:block w-80 h-100 rounded-2xl bg-[#131313] overflow-hidden relative">
         <span className="absolute top-3 left-3 bg-[#FF7441] rounded-2xl px-2 py-1 text-xs tracking-tighter font-black text-[#410F00]">
           NEXT SESSION
         </span>
@@ -158,12 +159,13 @@ function UpcommingSessions() {
           const month = monthNames[d.getMonth()];
           const year = d.getFullYear();
           return (
-            <Session
+            <SessionCard
               session={session}
               day={day.toString()}
               month={month}
+              key={session._id}
               year={year.toString()}
-              workoutName={workout?.workoutName!}
+              workout={workout!}
               tags={workout?.tags!}
             />
           );
