@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import type { Session } from "../../../../types/Session";
 import { updateSession } from "../Scripts/UpdateSession";
 import type { Workout } from "../../../../types/Workout";
 import type { Set } from "../../../../types/Set";
 import InputField from "../../../../Components/General/InputField";
+import { useSessions } from "../../../../Context/useSessions";
 
 interface Props {
   session: Session;
@@ -18,7 +19,9 @@ interface Props {
 function SessionCard({ session, day, month, year, workout, tags }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const [sessionData, setSessionData] = useState<Session>(session);
+  const { setSessions } = useSessions();
 
+  console.log(session);
   useEffect(() => {
     updateSession(sessionData);
   }, [sessionData]);
@@ -33,9 +36,9 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
         </div>
         <span className="md:h-20 w-50 md:w-1  border-b-2 md:border-b-0 md:border-r-2 border-[#484847]/10 md:min-w-1"></span>
         <span
-          className={`w-fit h-5 rounded-3xl tracking-tighter font-semibold px-2 py-4 text-center flex justify-center items-center ${sessionData.completed ? "bg-[#F3FFCA]/10 text-[#F3FFCA]" : "bg-[#FF7441]/10 text-[#FF7441]"}`}
+          className={`w-fit h-fit rounded-3xl tracking-tighter font-semibold px-2 py-2 text-center flex justify-center items-center ${sessionData.completed ? "bg-[#F3FFCA]/10 text-[#F3FFCA]" : "bg-[#FF7441]/10 text-[#FF7441]"}`}
         >
-          {sessionData.completed ? "COMPLETED" : "NOT COMPLETED"}
+          {session.completed ? "COMPLETED" : "NOT COMPLETED"}
         </span>
         <div>
           <p className="text-4xl text-white font-black tracking-tighter">
@@ -92,7 +95,7 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                 key={index}
                                 placeholder="0"
                                 value={set.reps}
-                                additionalClasses="w-15"
+                                additionalClasses="w-15!  bg-[#1A1A1A] rounded-2xl! border-0 h-7 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value)) return;
@@ -121,7 +124,7 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                 key={index}
                                 placeholder="0"
                                 value={set.weight}
-                                additionalClasses="w-15"
+                                additionalClasses="w-15! bg-[#1A1A1A] rounded-2xl! border-0 h-7 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value)) return;
@@ -199,15 +202,22 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
           </section>
           <GlowingButton
             onClick={() => {
+              setSessions((prev: Session[]) =>
+                prev.map((sessionS: Session) =>
+                  sessionS._id === session._id
+                    ? { ...sessionData, completed: !sessionS.completed }
+                    : sessionS,
+                ),
+              );
               setSessionData((prev) => ({
                 ...prev,
                 completed: !prev.completed,
               }));
             }}
             outline={false}
-            additionalClasses="bg-none !bg-lime-400 rounded-2xl px-2 py-2 tracking-tighter font-black cursor-pointer text-[#4A5E00]! w-40! text-xs!"
+            additionalClasses={`bg-none !bg-lime-400 rounded-2xl px-2 py-2 tracking-tighter font-black cursor-pointer text-[#4A5E00]! w-40! text-xs! ${!sessionData.completed ? "" : "!bg-red-400 text-red-500! hover:shadow-[0_0_15px_rgba(255,0,0,0.7),0_0_30px_rgba(255,100,100,0.6)]!"}`}
           >
-            COMPLETE WORKOUT
+            {!sessionData.completed ? "COMPLETE WORKOUT" : "UNCOMPLETE WORKOUT"}
           </GlowingButton>
         </div>
       )}

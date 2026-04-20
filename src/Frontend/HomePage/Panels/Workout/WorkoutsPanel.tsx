@@ -1,11 +1,16 @@
 import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
-import { act, use, useEffect, useState, type JSX } from "react";
+import { act, use, useEffect, useMemo, useState, type JSX } from "react";
 import UpcommingSessions from "./Components/UpcommingSessions";
 import CreateWorkout from "./Components/Create/CreateWorkout";
 import PastSessions from "./Components/PastSessions";
 import { getExercices } from "./Scripts/GetExercices";
 import type { Exercice } from "../../../types/Exercice";
+import type { Session } from "../../../types/Session";
+import { getSessions } from "./Scripts/GetSessions";
+import { getWorkouts } from "./Scripts/GetWorkouts";
+import type { Workout } from "../../../types/Workout";
+import { SessionProvider, useSessions } from "../../../Context/useSessions";
 
 export const Panel = {
   PAST: "PAST",
@@ -17,38 +22,95 @@ export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 
 function WorkoutsPanel() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.UPCOMMING);
-  const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
-    <UpcommingSessions />,
-  );
+
   const [exercices, setExercices] = useState<Exercice[]>([]);
+  const { sessions, setSessions } = useSessions();
+
+  const { futureSessions, pastSessions } = useMemo(() => {
+    const future: Session[] = [];
+    const past: Session[] = [];
+
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    for (const s of sessions) {
+      const date = new Date(s.date);
+      const isPast = s.completed || date < startOfToday;
+
+      (isPast ? past : future).push(s);
+    }
+    console.log("Recomputing", future);
+    return {
+      futureSessions: future.sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      ),
+      pastSessions: past.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      ),
+    };
+  }, [sessions]);
+
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
 
   useEffect(() => {
     (async () => {
+      const res1 = await getWorkouts();
+      if (res1.success) {
+        setWorkouts(res1.data);
+      }
+
       const res = await getExercices();
+      fetchSessions();
       setExercices(res.data);
     })();
   }, []);
 
-  useEffect(() => {
-    switch (activePanel) {
-      case Panel.UPCOMMING: {
-        exercices;
-        setActivePanelElement(<UpcommingSessions />);
-        break;
-      }
-      case Panel.CREATE: {
-        setActivePanelElement(<CreateWorkout exercices={exercices} />);
-        break;
-      }
-      case Panel.PAST: {
-        setActivePanelElement(<PastSessions />);
-        break;
-      }
-      default: {
-        setActivePanelElement(<UpcommingSessions />);
-      }
-    }
-  }, [activePanel]);
+  const fetchSessions = async () => {
+    const res = await getSessions();
+
+    if (!res.success) return;
+
+    setSessions(res.data);
+  };
+  let activePanelElement: JSX.Element;
+
+  switch (activePanel) {
+    case Panel.UPCOMMING:
+      activePanelElement = (
+        <UpcommingSessions
+          sessions={futureSessions}
+          updateSessions={fetchSessions}
+          workouts={workouts}
+          updateWorkouts={setWorkouts}
+        />
+      );
+      break;
+
+    case Panel.CREATE:
+      activePanelElement = <CreateWorkout exercices={exercices} />;
+      break;
+
+    case Panel.PAST:
+      activePanelElement = (
+        <PastSessions
+          sessions={pastSessions}
+          updateSessions={fetchSessions}
+          workouts={workouts}
+          updateWorkouts={setWorkouts}
+        />
+      );
+      break;
+
+    default:
+      activePanelElement = (
+        <UpcommingSessions
+          sessions={futureSessions}
+          updateSessions={fetchSessions}
+          workouts={workouts}
+          updateWorkouts={setWorkouts}
+        />
+      );
+  }
   return (
     <div className="">
       <NavBar></NavBar>
@@ -72,11 +134,58 @@ function WorkoutsPanel() {
               <div className="md:w-3/10 h-full flex gap-5 justify-center md:justify-end items-end">
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
                   <h2 className="text-[#ADAAAA] text-xs">THIS MONTH</h2>
-                  <p className="text-[#F3FFCA] font-black text-xl">24</p>
+                  <p className="text-[#F3FFCA] font-black text-xl">
+                    {
+                      sessions.filter(
+                        (s) =>
+                          new Date(s.date).getMonth() ===
+                            new Date().getMonth() &&
+                          new Date(s.date).getFullYear() ===
+                            new Date().getFullYear(),
+                      ).length
+                    }
+                  </p>
                 </article>
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
                   <h2 className="text-[#ADAAAA] text-xs">STREAK</h2>
-                  <p className="text-[#FF7441] font-black text-xl">12d</p>
+                  <p className="text-[#FF7441] font-black text-xl">
+                    {(() => {
+                      const completedDays = new Set(
+                        [...sessions, ...pastSessions]
+                          .filter((s) => s.completed)
+                          .map((s) => new Date(s.date).toDateString()),
+                      );
+
+                      const today = new Date();
+                      const yesterday = new Date();
+                      yesterday.setDate(today.getDate() - 1);
+
+                      const todayKey = today.toDateString();
+                      const yesterdayKey = yesterday.toDateString();
+
+                      // Gate condition: must have today or yesterday
+                      if (
+                        !completedDays.has(todayKey) &&
+                        !completedDays.has(yesterdayKey)
+                      ) {
+                        return "0d";
+                      }
+
+                      // Start from the most recent valid day (today if possible, else yesterday)
+                      const cursor = new Date(
+                        completedDays.has(todayKey) ? today : yesterday,
+                      );
+
+                      let streak = 0;
+
+                      while (completedDays.has(cursor.toDateString())) {
+                        streak++;
+                        cursor.setDate(cursor.getDate() - 1);
+                      }
+
+                      return streak + "d";
+                    })()}
+                  </p>
                 </article>
               </div>
             </div>
@@ -126,7 +235,7 @@ function WorkoutsPanel() {
             </GlowingButton>
           </div>
         </section>
-        {activePanelElement}
+        {sessions === undefined ? "Loading..." : activePanelElement}
       </main>
     </div>
   );

@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
@@ -7,17 +12,24 @@ import type { Workout } from "../../../../types/Workout";
 import SessionCard from "./SessionCard";
 import type { Session } from "../../../../types/Session.ts";
 
-function PastSessions() {
+interface Props {
+  sessions: Session[];
+  updateSessions: () => void;
+  workouts: Workout[];
+  updateWorkouts: Dispatch<SetStateAction<Workout[]>>;
+}
+
+function PastSessions({
+  sessions,
+  updateSessions,
+  workouts,
+  updateWorkouts,
+}: Props) {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [pastSessions, setPastSessions] = useState<Session[]>([]);
-
   const openWorkoutSelector = async () => {
     const res = await getWorkouts();
     if (res.success) {
-      setWorkouts(res.data);
+      updateWorkouts(res.data);
       setWorkoutSelectorOpen((prev) => !prev);
     }
   };
@@ -37,40 +49,6 @@ function PastSessions() {
     "Dec",
   ];
 
-  const fetchSessions = async () => {
-    const res1 = await getWorkouts();
-    if (res1.success) {
-      setWorkouts(res1.data);
-    }
-
-    const res = await getSessions();
-
-    if (res.success) {
-      const now = Date.now();
-
-      const pastSessions = res.data
-        .filter((session: Session) => new Date(session.date).getTime() < now)
-        .sort(
-          (a: Session, b: Session) =>
-            new Date(b.date).getTime() - new Date(a.date).getTime(),
-        ); // newest past first
-
-      const futureSessions = res.data
-        .filter((s: Session) => new Date(s.date).getTime() >= now)
-        .sort(
-          (a: Session, b: Session) =>
-            new Date(a.date).getTime() - new Date(b.date).getTime(),
-        ); // nearest future first
-
-      setSessions(futureSessions);
-      setPastSessions(pastSessions);
-    }
-  };
-
-  useEffect(() => {
-    fetchSessions();
-  }, []);
-
   return (
     <div className="flex gap-10">
       <GlowingButton
@@ -88,18 +66,17 @@ function PastSessions() {
         <img src="PlaceholderGym.png" alt="" className="mb-15" />
         <div className="px-5">
           <h2 className="text-white font-black tracking-tighter text-4xl absolute top-45">
-            {workouts.find(
-              (workout) => workout._id === pastSessions[0]?.workoutId,
-            )?.workoutName || "No Upcomming Session"}
+            {workouts.find((workout) => workout._id === sessions[0]?.workoutId)
+              ?.workoutName || "No Upcomming Session"}
           </h2>
           <div className="flex items-center gap-10">
             <div className="flex">
               <img src="CalenderIcon.png" alt="" className="h-4 mr-2" />
               <p className="text-[#ADAAAA] text-xs">
-                {pastSessions.length > 0
+                {sessions.length > 0
                   ? (() => {
                       const now = new Date();
-                      const sessionDate = new Date(pastSessions[0]?.date);
+                      const sessionDate = new Date(sessions[0]?.date);
 
                       // Strip time (IMPORTANT)
                       const today = new Date(
@@ -153,7 +130,7 @@ function PastSessions() {
       </article>
       {/* Session Section */}
       <section className="flex-1 flex flex-col gap-5">
-        {pastSessions.map((session: Session) => {
+        {sessions.map((session: Session) => {
           const workout = workouts.find((w) => w._id === session.workoutId);
           const d = new Date(session.date);
 
@@ -174,7 +151,7 @@ function PastSessions() {
       </section>
       {workoutSelectorOpen && (
         <WorkoutSelector
-          updateSessions={fetchSessions}
+          updateSessions={updateSessions}
           closeSelector={openWorkoutSelector}
           workouts={workouts}
         />

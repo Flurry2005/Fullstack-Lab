@@ -22,7 +22,7 @@ function Exercise({
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        additionalClasses="w-fit"
+        additionalClasses="w-fit! bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
       ></InputField>
       <li className="list-none flex gap-5 flex-wrap">
         {exercices

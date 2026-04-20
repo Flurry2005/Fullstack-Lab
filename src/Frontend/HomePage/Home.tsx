@@ -4,6 +4,7 @@ import ProfilePanel from "./Panels/ProfilePanel";
 import DashboardPanel from "./Panels/DashboardPanel";
 import GlowingButton from "../Components/General/GlowingButton";
 import WorkoutsPanel from "./Panels/Workout/WorkoutsPanel";
+import { SessionProvider } from "../Context/useSessions";
 
 export const Panel = {
   HOME: "HOME",
@@ -34,7 +35,11 @@ function Home() {
         break;
       }
       case Panel.WORKOUTS: {
-        setActivePanelElement(<WorkoutsPanel />);
+        setActivePanelElement(
+          <SessionProvider>
+            <WorkoutsPanel />
+          </SessionProvider>,
+        );
         break;
       }
       default: {
@@ -78,7 +83,7 @@ function Home() {
               <>
                 <button
                   onClick={() => setActivePanel(Panel.HOME)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.HOME ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
+                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.HOME ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div
                     className={`h-4 w-4 ${
@@ -101,7 +106,7 @@ function Home() {
                 </button>
                 <button
                   onClick={() => setActivePanel(Panel.DASHBOARD)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.DASHBOARD ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
+                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.DASHBOARD ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div
                     className={`h-4 w-4 ${
@@ -124,7 +129,7 @@ function Home() {
                 </button>
                 <button
                   onClick={() => setActivePanel(Panel.WORKOUTS)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.WORKOUTS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
+                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.WORKOUTS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div
                     className={`h-4 w-4 ${
@@ -147,7 +152,7 @@ function Home() {
                 </button>
                 <button
                   onClick={() => setActivePanel(Panel.PROGRESS)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.PROGRESS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
+                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROGRESS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div
                     className={`h-4 w-4 ${
@@ -170,7 +175,7 @@ function Home() {
                 </button>
                 <button
                   onClick={() => setActivePanel(Panel.PROFILE)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.PROFILE ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
+                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROFILE ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div
                     className={`h-4 w-4 ${

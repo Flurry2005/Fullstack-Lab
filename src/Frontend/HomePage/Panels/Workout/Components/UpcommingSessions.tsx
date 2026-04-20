@@ -1,26 +1,34 @@
-import React, { useEffect, useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
-import { getSessions } from "../Scripts/GetSessions";
 import type { Workout } from "../../../../types/Workout";
 import SessionCard from "./SessionCard.tsx";
 import type { Session } from "../../../../types/Session.ts";
 
-function UpcommingSessions() {
-  const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+interface Props {
+  sessions: Session[];
+  updateSessions: () => void;
+  workouts: Workout[];
+  updateWorkouts: Dispatch<SetStateAction<Workout[]>>;
+}
 
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [pastSessions, setPastSessions] = useState<Session[]>([]);
+function UpcommingSessions({
+  sessions,
+  updateSessions,
+  workouts,
+  updateWorkouts,
+}: Props) {
+  const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
 
   const openWorkoutSelector = async () => {
     const res = await getWorkouts();
     if (res.success) {
-      setWorkouts(res.data);
+      updateWorkouts(res.data);
       setWorkoutSelectorOpen((prev) => !prev);
     }
   };
+  console.log(sessions);
 
   const monthNames = [
     "Jan",
@@ -36,40 +44,6 @@ function UpcommingSessions() {
     "Nov",
     "Dec",
   ];
-
-  const fetchSessions = async () => {
-    const res1 = await getWorkouts();
-    if (res1.success) {
-      setWorkouts(res1.data);
-    }
-
-    const res = await getSessions();
-
-    if (res.success) {
-      const now = Date.now();
-
-      const pastSessions = res.data
-        .filter((session: Session) => new Date(session.date).getTime() < now)
-        .sort(
-          (a: Session, b: Session) =>
-            new Date(b.date).getTime() - new Date(a.date).getTime(),
-        ); // newest past first
-
-      const futureSessions = res.data
-        .filter((s: Session) => new Date(s.date).getTime() >= now)
-        .sort(
-          (a: Session, b: Session) =>
-            new Date(a.date).getTime() - new Date(b.date).getTime(),
-        ); // nearest future first
-
-      setSessions(futureSessions);
-      setPastSessions(pastSessions);
-    }
-  };
-
-  useEffect(() => {
-    fetchSessions();
-  }, []);
 
   return (
     <div className="flex gap-10">
@@ -173,7 +147,7 @@ function UpcommingSessions() {
       </section>
       {workoutSelectorOpen && (
         <WorkoutSelector
-          updateSessions={fetchSessions}
+          updateSessions={updateSessions}
           closeSelector={openWorkoutSelector}
           workouts={workouts}
         />
