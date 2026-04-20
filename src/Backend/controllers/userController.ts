@@ -56,12 +56,13 @@ class UserController {
       .json({ succes: true, data: "Account successfully registered!" });
   }
   async createWorkout(req: Request<{}, {}, WorkoutBody>, res: Response) {
-    const { workoutName, tags, exercices } = req.body;
+    const { workoutName, workoutDesc, tags, exercices } = req.body;
     const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
     if (await userModel.GetUser({ _id: userId })) {
       await workoutModel.CreateWorkout({
         userId: res.locals.jwt.userId,
         workoutName: workoutName,
+        workoutDesc: workoutDesc,
         tags: tags!,
         exercices: exercices,
       });
@@ -134,6 +135,7 @@ type RegisterBody = {
 };
 type WorkoutBody = {
   workoutName: string;
+  workoutDesc: string;
   tags?: [];
   exercices: Exercice[];
 };

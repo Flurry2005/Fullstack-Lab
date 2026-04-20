@@ -5,6 +5,7 @@ import DashboardPanel from "./Panels/DashboardPanel";
 import GlowingButton from "../Components/General/GlowingButton";
 import WorkoutsPanel from "./Panels/Workout/WorkoutsPanel";
 import { SessionProvider } from "../Context/useSessions";
+import { Link } from "react-router-dom";
 
 export const Panel = {
   HOME: "HOME",
@@ -16,9 +17,13 @@ export const Panel = {
 
 export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 
-function Home() {
+interface Props {
+  panel: (typeof Panel)[keyof typeof Panel];
+}
+
+function Home({ panel }: Props) {
   const { user } = useAuth();
-  const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.HOME);
+  const [activePanel, setActivePanel] = useState<ActivePanel>(panel);
 
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
     <ProfilePanel />,
@@ -58,7 +63,8 @@ function Home() {
           </div>
           <nav>
             {!user ? (
-              <button
+              <Link
+                to={"/"}
                 onClick={() => setActivePanel(Panel.HOME)}
                 className={`w-full h-10 flex px-2 gap-2 items-center ${activePanel === Panel.HOME ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
               >
@@ -78,10 +84,11 @@ function Home() {
                   }}
                 />
                 Home
-              </button>
+              </Link>
             ) : (
               <>
-                <button
+                <Link
+                  to={"/"}
                   onClick={() => setActivePanel(Panel.HOME)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.HOME ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -103,8 +110,9 @@ function Home() {
                     }}
                   />
                   Home
-                </button>
-                <button
+                </Link>
+                <Link
+                  to={"/dashboard"}
                   onClick={() => setActivePanel(Panel.DASHBOARD)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.DASHBOARD ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -126,8 +134,9 @@ function Home() {
                     }}
                   />
                   Dashboard
-                </button>
-                <button
+                </Link>
+                <Link
+                  to={"/workouts"}
                   onClick={() => setActivePanel(Panel.WORKOUTS)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.WORKOUTS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -149,8 +158,9 @@ function Home() {
                     }}
                   />
                   Workouts
-                </button>
-                <button
+                </Link>
+                <Link
+                  to={"/progress"}
                   onClick={() => setActivePanel(Panel.PROGRESS)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROGRESS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -172,8 +182,9 @@ function Home() {
                     }}
                   />
                   Progress
-                </button>
-                <button
+                </Link>
+                <Link
+                  to={"/profile"}
                   onClick={() => setActivePanel(Panel.PROFILE)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROFILE ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -195,7 +206,7 @@ function Home() {
                     }}
                   />
                   Profile
-                </button>
+                </Link>
               </>
             )}
           </nav>
@@ -210,7 +221,7 @@ function Home() {
           )}
         </aside>
         <section className="bg-[#0E0E0E] w-full min-h-full pb-10">
-          {activePanelElement}
+          {(user && activePanelElement) || <DashboardPanel />}
         </section>
       </main>
     </>

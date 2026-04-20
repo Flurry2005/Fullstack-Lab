@@ -2,6 +2,7 @@ import type { Exercice } from "../../../../types/Exercice";
 
 export async function createWorkout(
   workoutName: string,
+  workoutDesc: string,
   tags: string[],
   exercices: Exercice[],
 ) {
@@ -17,7 +18,12 @@ export async function createWorkout(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ workoutName: workoutName, tags, exercices }),
+      body: JSON.stringify({
+        workoutName: workoutName,
+        workoutDesc: workoutDesc,
+        tags,
+        exercices,
+      }),
       credentials: "include",
     });
 

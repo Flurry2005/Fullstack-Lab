@@ -6,6 +6,7 @@ import type { Workout } from "../../../../types/Workout";
 import type { Set } from "../../../../types/Set";
 import InputField from "../../../../Components/General/InputField";
 import { useSessions } from "../../../../Context/useSessions";
+import { useAuth } from "../../../../Context/useAuth";
 
 interface Props {
   session: Session;
@@ -20,10 +21,16 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const [sessionData, setSessionData] = useState<Session>(session);
   const { setSessions } = useSessions();
+  const { logout } = useAuth();
 
   console.log(session);
   useEffect(() => {
-    updateSession(sessionData);
+    (async () => {
+      const res = await updateSession(sessionData);
+      if (!res.success) {
+        logout();
+      }
+    })();
   }, [sessionData]);
 
   return (
@@ -44,7 +51,7 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
           <p className="text-4xl text-white font-black tracking-tighter">
             {workout.workoutName ?? "Unknown workout"}
           </p>
-          <p className="text-xs text-[#ADAAAA]">Temporary</p>
+          <p className="text-xs text-[#ADAAAA]">{workout.workoutDesc}</p>
         </div>
         {/*Tags */}
         <div className="flex flex-col justify-center items-end flex-1">
@@ -202,6 +209,10 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
           </section>
           <GlowingButton
             onClick={() => {
+              setSessionData((prev) => ({
+                ...prev,
+                completed: !prev.completed,
+              }));
               setSessions((prev: Session[]) =>
                 prev.map((sessionS: Session) =>
                   sessionS._id === session._id
@@ -209,10 +220,6 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                     : sessionS,
                 ),
               );
-              setSessionData((prev) => ({
-                ...prev,
-                completed: !prev.completed,
-              }));
             }}
             outline={false}
             additionalClasses={`bg-none !bg-lime-400 rounded-2xl px-2 py-2 tracking-tighter font-black cursor-pointer text-[#4A5E00]! w-40! text-xs! ${!sessionData.completed ? "" : "!bg-red-400 text-red-500! hover:shadow-[0_0_15px_rgba(255,0,0,0.7),0_0_30px_rgba(255,100,100,0.6)]!"}`}

@@ -11,6 +11,7 @@ import { getSessions } from "../Scripts/GetSessions";
 import type { Workout } from "../../../../types/Workout";
 import SessionCard from "./SessionCard";
 import type { Session } from "../../../../types/Session.ts";
+import { useAuth } from "../../../../Context/useAuth.tsx";
 
 interface Props {
   sessions: Session[];
@@ -26,11 +27,14 @@ function PastSessions({
   updateWorkouts,
 }: Props) {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
+  const { logout } = useAuth();
   const openWorkoutSelector = async () => {
     const res = await getWorkouts();
     if (res.success) {
       updateWorkouts(res.data);
       setWorkoutSelectorOpen((prev) => !prev);
+    } else {
+      logout();
     }
   };
 

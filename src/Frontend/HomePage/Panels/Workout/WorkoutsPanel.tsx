@@ -11,6 +11,8 @@ import { getSessions } from "./Scripts/GetSessions";
 import { getWorkouts } from "./Scripts/GetWorkouts";
 import type { Workout } from "../../../types/Workout";
 import { SessionProvider, useSessions } from "../../../Context/useSessions";
+import { useAuth } from "../../../Context/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const Panel = {
   PAST: "PAST",
@@ -25,6 +27,8 @@ function WorkoutsPanel() {
 
   const [exercices, setExercices] = useState<Exercice[]>([]);
   const { sessions, setSessions } = useSessions();
+
+  const { logout } = useAuth();
 
   const { futureSessions, pastSessions } = useMemo(() => {
     const future: Session[] = [];
@@ -57,6 +61,8 @@ function WorkoutsPanel() {
       const res1 = await getWorkouts();
       if (res1.success) {
         setWorkouts(res1.data);
+      } else {
+        logout();
       }
 
       const res = await getExercices();
@@ -141,7 +147,8 @@ function WorkoutsPanel() {
                           new Date(s.date).getMonth() ===
                             new Date().getMonth() &&
                           new Date(s.date).getFullYear() ===
-                            new Date().getFullYear(),
+                            new Date().getFullYear() &&
+                          s.completed,
                       ).length
                     }
                   </p>

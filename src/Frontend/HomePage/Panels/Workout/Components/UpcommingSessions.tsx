@@ -5,6 +5,7 @@ import { getWorkouts } from "../Scripts/GetWorkouts";
 import type { Workout } from "../../../../types/Workout";
 import SessionCard from "./SessionCard.tsx";
 import type { Session } from "../../../../types/Session.ts";
+import { useAuth } from "../../../../Context/useAuth.tsx";
 
 interface Props {
   sessions: Session[];
@@ -20,12 +21,15 @@ function UpcommingSessions({
   updateWorkouts,
 }: Props) {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
+  const { logout } = useAuth();
 
   const openWorkoutSelector = async () => {
     const res = await getWorkouts();
     if (res.success) {
       updateWorkouts(res.data);
       setWorkoutSelectorOpen((prev) => !prev);
+    } else {
+      logout();
     }
   };
   console.log(sessions);

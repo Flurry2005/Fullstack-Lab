@@ -21,9 +21,11 @@ function CreateWorkout({ exercices }: Props) {
           const formData = new FormData(e.currentTarget);
 
           const workoutName = formData.get("workoutName")?.toString();
+          const workoutDesc = formData.get("workoutDesc")?.toString();
 
           const res = await createWorkout(
             workoutName!,
+            workoutDesc!,
             tags,
             selectedExercices,
           );
@@ -42,6 +44,16 @@ function CreateWorkout({ exercices }: Props) {
           placeholder="Chest Focus"
           id="workoutName"
           name="workoutName"
+          required={true}
+          additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
+        ></InputField>
+        <label htmlFor="workoutDesc" className="text-white">
+          Workout Description
+        </label>
+        <InputField
+          placeholder="Description..."
+          id="workoutDesc"
+          name="workoutDesc"
           required={true}
           additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
         ></InputField>

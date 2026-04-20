@@ -5,17 +5,20 @@ class WorkoutModel {
   async CreateWorkout({
     userId,
     workoutName,
+    workoutDesc,
     tags,
     exercices,
   }: {
     userId: string;
     workoutName: string;
+    workoutDesc: string;
     tags: string[];
     exercices: Exercice[];
   }) {
     return await Database.db.collection("workouts").insertOne({
       userId: userId,
       workoutName: workoutName,
+      workoutDesc: workoutDesc,
       tags: tags,
       exercices: exercices,
     });
