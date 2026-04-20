@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import Database from "../services/Database.ts";
 import bcrypt from "bcrypt";
+import type { User } from "../../Frontend/types/User.ts";
 class UserModel {
   async GetUser({
     email,
@@ -38,6 +39,13 @@ class UserModel {
       passwordHash: await bcrypt.hash(password, 12),
       createdAt: new Date(),
     });
+  }
+  async UpdateUser(user: User) {
+    const { _id, ...updateData } = user;
+
+    return await Database.db
+      .collection("users")
+      .updateOne({ _id: new ObjectId(_id) }, { $set: updateData });
   }
 }
 

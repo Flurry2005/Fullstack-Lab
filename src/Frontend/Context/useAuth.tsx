@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { AuthContextType, User } from "../types/User";
+import { updateUser } from "../HomePage/Panels/Workout/Scripts/UpdateUser";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -14,6 +15,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(User);
     }
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    updateUser(user);
+  }, [user]);
 
   const login = (userData: User) => {
     setUser(userData);

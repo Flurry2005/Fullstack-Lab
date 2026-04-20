@@ -7,6 +7,7 @@ export type User = {
   email: string;
   createdAt: Date;
   profilePicture?: string;
+  bio?: string;
 };
 
 export type AuthContextType = {

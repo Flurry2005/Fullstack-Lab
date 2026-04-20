@@ -1,8 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, type ReactHTMLElement } from "react";
 import { useAuth } from "../../Context/useAuth";
 import NavBar from "../../NavBar";
+import { updateUser } from "./Workout/Scripts/UpdateUser";
 function ProfilePanel() {
   const { user, login } = useAuth();
+  const [bio, setBio] = useState<string>(user?.bio || "");
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -40,7 +42,7 @@ function ProfilePanel() {
         <NavBar />
         <main className="flex flex-col px-10 gap-10 h-full pt-10 w-full">
           <section className="flex justify-between px-10 h-fit">
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full">
               <img
                 src={
                   user.profilePicture
@@ -69,20 +71,34 @@ function ProfilePanel() {
                   />
                 </div>
               </a>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 w-full">
                 <h2 className="font-black text-6xl text-white tracking-tighter">
                   {user.fullname.toUpperCase()}
                 </h2>
                 <span className="rounded-2xl bg-[#262626] px-3 text-xs py-1 w-fit text-[#F3FFCA]">
                   LEVEL 67
                 </span>
-                <p className="text-[#ADAAAA]">
-                  Hybrid Athlete. Pushing the boundaries of human performance
-                  through data-driven strength and endurance protocols.
-                </p>
+                <textarea
+                  className="text-[#ADAAAA] max-w-full resize-none"
+                  value={bio}
+                  maxLength={150}
+                  onChange={(e) => setBio(e.currentTarget.value)}
+                  onBlur={() => {
+                    login({
+                      ...user,
+                      bio,
+                    });
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault(); // prevents newline
+                      e.currentTarget.blur(); // removes focus
+                    }
+                  }}
+                />
               </div>
             </div>
-            <div className="h-full flex flex-col justify-end px-3">
+            <div className="h-full w-fit flex flex-col justify-end px-3">
               <h3 className="text-[#ADAAAA] text-l">MEMEBER SINCE</h3>
               <h2 className="text-[#F3FFCA] text-2xl font-extrabold">
                 {user.createdAt.toString().split("T")[0]}

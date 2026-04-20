@@ -10,6 +10,9 @@ router.post("/login", (req, res, next) => {
 router.post("/register", (req, res, next) => {
   userController.register(req, res);
 });
+router.post("/update-user", (req, res, next) => {
+  userController.updateUser(req, res);
+});
 router.post(
   "/create-workout",
   jwtMiddleware.jwtTokenIsValid,

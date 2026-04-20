@@ -7,6 +7,7 @@ import workoutModel from "../models/workoutModel.ts";
 import sessionModel from "../models/sessionModel.ts";
 import type { Session } from "../../Frontend/types/Session.ts";
 import type { Exercice } from "../../Frontend/types/Exercice.ts";
+import type { User } from "../../Frontend/types/User.ts";
 
 class UserController {
   async login(req: Request<{}, {}, LoginBody>, res: Response) {
@@ -50,6 +51,24 @@ class UserController {
       email,
       password: password,
     });
+
+    return res
+      .status(200)
+      .json({ succes: true, data: "Account successfully registered!" });
+  }
+  async updateUser(req: Request<{}, {}, User>, res: Response) {
+    const user = req.body as User;
+    if (!(await userModel.GetUser({ username: user.username }))) {
+      return res
+        .status(409)
+        .json({ success: false, error: "Username doesnt exists!" });
+    }
+    if (!(await userModel.GetUser({ email: user.email }))) {
+      return res
+        .status(409)
+        .json({ success: false, error: "Email doesnt exists!" });
+    }
+    await userModel.UpdateUser(user);
 
     return res
       .status(200)
