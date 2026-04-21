@@ -137,64 +137,72 @@ function ProfilePanel() {
             </div>
           </section>
 
-          {/* Stats */}
-          <section className="h-full w-full flex justify-around">
-            <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
-              <div className="bg-[#F3FFCA] absolute bottom-0 left-0 h-1 w-full"></div>
-              <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
-                WORKOUTS
-              </h2>
-              <p className="text-white font-black text-6xl">
-                {sessions === undefined
-                  ? "Loading..."
-                  : sessions.filter(
-                      (session: Session) => session.completed === true,
-                    ).length}
-              </p>
-            </article>
-            <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
-              <div className="bg-[#FF7441] absolute bottom-0 left-0 h-1 w-full"></div>
-              <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
-                STREAK
-              </h2>
-              <div className="flex gap-2 items-center">
+          {/* Stats Board */}
+          <main className="h-full w-full flex flex-col justify-around">
+            {/* Heading */}
+            <div className="flex items-center gap-2 mb-5">
+              <span className="w-25 block bg-[#ADAAAA] h-0.5" />
+              <p className="text-[#ADAAAA]">Statistics</p>
+            </div>
+            {/* Stats */}
+            <section className="flex gap-5">
+              <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
+                <div className="bg-[#F3FFCA] absolute bottom-0 left-0 h-1 w-full"></div>
+                <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
+                  WORKOUTS
+                </h2>
                 <p className="text-white font-black text-6xl">
                   {sessions === undefined
                     ? "Loading..."
-                    : (() => {
-                        const completedDays = new Set(
-                          sessions
-                            .filter((s) => s.completed)
-                            .map((s) => new Date(s.date).toDateString()),
-                        );
-                        const today = new Date();
-                        const yesterday = new Date();
-                        yesterday.setDate(today.getDate() - 1);
-                        const todayKey = today.toDateString();
-                        const yesterdayKey = yesterday.toDateString();
-                        // Gate condition: must have today or yesterday
-                        if (
-                          !completedDays.has(todayKey) &&
-                          !completedDays.has(yesterdayKey)
-                        ) {
-                          return "0";
-                        }
-                        // Start from the most recent valid day (today if possible, else yesterday)
-                        const cursor = new Date(
-                          completedDays.has(todayKey) ? today : yesterday,
-                        );
-                        let streak = 0;
-                        while (completedDays.has(cursor.toDateString())) {
-                          streak++;
-                          cursor.setDate(cursor.getDate() - 1);
-                        }
-                        return streak;
-                      })()}
+                    : sessions.filter(
+                        (session: Session) => session.completed === true,
+                      ).length}
                 </p>
-                <img src="StreakIcon.png" alt="" className="h-10" />
-              </div>
-            </article>
-          </section>
+              </article>
+              <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
+                <div className="bg-[#FF7441] absolute bottom-0 left-0 h-1 w-full"></div>
+                <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
+                  STREAK
+                </h2>
+                <div className="flex gap-2 items-center">
+                  <p className="text-white font-black text-6xl">
+                    {sessions === undefined
+                      ? "Loading..."
+                      : (() => {
+                          const completedDays = new Set(
+                            sessions
+                              .filter((s) => s.completed)
+                              .map((s) => new Date(s.date).toDateString()),
+                          );
+                          const today = new Date();
+                          const yesterday = new Date();
+                          yesterday.setDate(today.getDate() - 1);
+                          const todayKey = today.toDateString();
+                          const yesterdayKey = yesterday.toDateString();
+                          // Gate condition: must have today or yesterday
+                          if (
+                            !completedDays.has(todayKey) &&
+                            !completedDays.has(yesterdayKey)
+                          ) {
+                            return "0";
+                          }
+                          // Start from the most recent valid day (today if possible, else yesterday)
+                          const cursor = new Date(
+                            completedDays.has(todayKey) ? today : yesterday,
+                          );
+                          let streak = 0;
+                          while (completedDays.has(cursor.toDateString())) {
+                            streak++;
+                            cursor.setDate(cursor.getDate() - 1);
+                          }
+                          return streak;
+                        })()}
+                  </p>
+                  <img src="StreakIcon.png" alt="" className="h-10" />
+                </div>
+              </article>
+            </section>
+          </main>
         </main>
       </div>
     </>
