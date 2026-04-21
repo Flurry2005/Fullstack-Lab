@@ -125,7 +125,7 @@ class UserController {
           .status(404)
           .json({ succes: false, error: "Workout not found!" });
 
-      return await Sessions.insertOne({
+      await Sessions.insertOne({
         userId: res.locals.jwt.userId,
         workoutId: workoutId,
         completed: false,

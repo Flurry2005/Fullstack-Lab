@@ -159,7 +159,7 @@ function ProfilePanel() {
                       ).length}
                 </p>
               </article>
-              <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
+              <article className="bg-[#1A1A1A] w-60 h-40 rounded-3xl flex flex-col px-10 py-5 justify-around overflow-hidden relative">
                 <div className="bg-[#FF7441] absolute bottom-0 left-0 h-1 w-full"></div>
                 <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
                   STREAK
@@ -198,8 +198,49 @@ function ProfilePanel() {
                           return streak;
                         })()}
                   </p>
+
                   <img src="StreakIcon.png" alt="" className="h-10" />
                 </div>
+                <p className="text-[#ADAAAA] text-xs">
+                  {sessions === undefined
+                    ? "Loading..."
+                    : (() => {
+                        const completedDays = new Set(
+                          sessions
+                            .filter((s) => s.completed)
+                            .map((s) => new Date(s.date).toDateString()),
+                        );
+
+                        const days = Array.from(completedDays)
+                          .map((d) => new Date(d))
+                          .sort((a, b) => a.getTime() - b.getTime());
+
+                        if (days.length === 0) return 0;
+
+                        let longest = 1;
+                        let current = 1;
+
+                        for (let i = 1; i < days.length; i++) {
+                          const prev = days[i - 1];
+                          const curr = days[i];
+
+                          const diff =
+                            (curr.getTime() - prev.getTime()) /
+                            (1000 * 60 * 60 * 24);
+
+                          if (diff === 1) {
+                            current++;
+                          } else {
+                            longest = Math.max(longest, current);
+                            current = 1;
+                          }
+                        }
+
+                        longest = Math.max(longest, current);
+
+                        return "Personal Best: " + longest + " Days";
+                      })()}
+                </p>
               </article>
             </section>
           </main>
