@@ -1,13 +1,7 @@
-import React, {
-  useEffect,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import WorkoutSelector from "./WorkoutSelector";
 import { getWorkouts } from "../Scripts/GetWorkouts";
-import { getSessions } from "../Scripts/GetSessions";
 import type { Workout } from "../../../../types/Workout";
 import SessionCard from "./SessionCard";
 import type { Session } from "../../../../types/Session.ts";
@@ -17,7 +11,7 @@ interface Props {
   sessions: Session[];
   updateSessions: () => void;
   workouts: Workout[];
-  updateWorkouts: Dispatch<SetStateAction<Workout[]>>;
+  updateWorkouts: Dispatch<SetStateAction<Workout[] | undefined>>;
 }
 
 function PastSessions({

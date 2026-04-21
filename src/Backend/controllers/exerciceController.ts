@@ -1,13 +1,13 @@
 import type { Request, Response, NextFunction } from "express";
 import { ObjectId } from "mongodb";
-import userModel from "../models/userModel.ts";
-import exerciceModel from "../models/exerciceModel.ts";
+import Users from "../models/userModel.ts";
+import Exercice from "../models/exerciceModel.ts";
 
 class ExerciceController {
   async getWorkouts(req: Request<{}, {}, any>, res: Response) {
     const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
-    if (await userModel.GetUser({ _id: userId })) {
-      const exercices = await exerciceModel.GetExercices();
+    if (await Users.findOne({ _id: userId })) {
+      const exercices = await Exercice.find({});
       return res.status(200).json({ success: true, data: exercices });
     }
 

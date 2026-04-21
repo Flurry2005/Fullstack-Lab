@@ -1,9 +1,26 @@
-import Database from "../services/Database.ts";
+import mongoose from "mongoose";
 
-class ExerciceModel {
-  async GetExercices() {
-    return await Database.db.collection("exercices").find({}).toArray();
-  }
-}
+const exerciceSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    minlength: 2,
+    maxlength: 20,
+  },
+  type: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
+  muscles: {
+    type: [String],
+    required: true,
+    minlength: 1,
+  },
+});
 
-export default new ExerciceModel();
+export default mongoose.model("Exercice", exerciceSchema);

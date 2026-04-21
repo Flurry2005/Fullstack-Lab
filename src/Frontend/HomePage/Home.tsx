@@ -26,13 +26,17 @@ function Home({ panel }: Props) {
   const [activePanel, setActivePanel] = useState<ActivePanel>(panel);
 
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
-    <ProfilePanel />,
+    <DashboardPanel />,
   );
 
   useEffect(() => {
     switch (activePanel) {
       case Panel.PROFILE: {
-        setActivePanelElement(<ProfilePanel />);
+        setActivePanelElement(
+          <SessionProvider>
+            <ProfilePanel />
+          </SessionProvider>,
+        );
         break;
       }
       case Panel.DASHBOARD: {

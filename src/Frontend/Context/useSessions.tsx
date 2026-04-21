@@ -1,21 +1,33 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type Dispatch,
   type SetStateAction,
 } from "react";
 import type { Session } from "../types/Session";
+import { getSessions } from "../HomePage/Panels/Workout/Scripts/GetSessions";
 
 type SessionContextType = {
-  sessions: Session[];
-  setSessions: Dispatch<SetStateAction<Session[]>>;
+  sessions: Session[] | undefined;
+  setSessions: Dispatch<SetStateAction<Session[] | undefined>>;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<Session[] | undefined>(undefined);
+
+  useEffect(() => {
+    (async () => {
+      const res = await getSessions();
+
+      if (!res.success) return;
+
+      setSessions(res.data);
+    })();
+  }, []);
 
   return (
     <SessionContext.Provider value={{ sessions, setSessions }}>

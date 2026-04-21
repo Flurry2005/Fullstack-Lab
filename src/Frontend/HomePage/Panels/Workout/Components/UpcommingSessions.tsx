@@ -11,7 +11,7 @@ interface Props {
   sessions: Session[];
   updateSessions: () => void;
   workouts: Workout[];
-  updateWorkouts: Dispatch<SetStateAction<Workout[]>>;
+  updateWorkouts: Dispatch<SetStateAction<Workout[] | undefined>>;
 }
 
 function UpcommingSessions({
@@ -32,7 +32,6 @@ function UpcommingSessions({
       logout();
     }
   };
-  console.log(sessions);
 
   const monthNames = [
     "Jan",

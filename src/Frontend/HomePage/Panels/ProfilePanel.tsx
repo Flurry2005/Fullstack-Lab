@@ -1,10 +1,32 @@
-import React, { useRef, useState, type ReactHTMLElement } from "react";
+import React, { useRef, useState } from "react";
 import { useAuth } from "../../Context/useAuth";
 import NavBar from "../../NavBar";
-import { updateUser } from "./Workout/Scripts/UpdateUser";
+import { useSessions } from "../../Context/useSessions";
+import type { Workout } from "../../types/Workout";
+import type { Session } from "../../types/Session.ts";
 function ProfilePanel() {
   const { user, login } = useAuth();
-  const [bio, setBio] = useState<string>(user?.bio || "");
+  const [bio, setBio] = useState<string>(
+    user?.bio ||
+      "Hybrid Athlete. Pushing the boundaries of human performance through data-driven strength and endurance protocols.",
+  );
+
+  const { sessions } = useSessions();
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -41,8 +63,8 @@ function ProfilePanel() {
       <div>
         <NavBar />
         <main className="flex flex-col px-10 gap-10 h-full pt-10 w-full">
-          <section className="flex justify-between px-10 h-fit">
-            <div className="flex gap-2 w-full">
+          <section className="flex justify-between px-10 h-60">
+            <div className="flex gap-2 w-full ">
               <img
                 src={
                   user.profilePicture
@@ -50,10 +72,10 @@ function ProfilePanel() {
                     : "profilePicture.png"
                 }
                 alt=""
-                className="rounded-full border-5 border-[#0a0202] h-50 w-auto aspect-square"
+                className="rounded-full border-5 border-[#1A1A1A] h-50 w-auto aspect-square self-end"
               />
               <a
-                className="relative w-4 h-50 rounded-full cursor-pointer"
+                className="relative w-4 h-full rounded-full cursor-pointer"
                 onClick={openFilePicker}
               >
                 <input
@@ -79,10 +101,15 @@ function ProfilePanel() {
                   LEVEL 67
                 </span>
                 <textarea
-                  className="text-[#ADAAAA] max-w-full resize-none"
+                  className="text-[#ADAAAA] w-1/2 resize-none overflow-hidden"
                   value={bio}
                   maxLength={150}
-                  onChange={(e) => setBio(e.currentTarget.value)}
+                  onChange={(e) => {
+                    setBio(e.currentTarget.value);
+                    // auto-resize
+                    e.currentTarget.style.height = "auto";
+                    e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                  }}
                   onBlur={() => {
                     login({
                       ...user,
@@ -98,12 +125,75 @@ function ProfilePanel() {
                 />
               </div>
             </div>
-            <div className="h-full w-fit flex flex-col justify-end px-3">
-              <h3 className="text-[#ADAAAA] text-l">MEMEBER SINCE</h3>
-              <h2 className="text-[#F3FFCA] text-2xl font-extrabold">
-                {user.createdAt.toString().split("T")[0]}
+            <div className="h-full w-fit flex flex-col justify-end items-center px-3">
+              <h3 className="text-[#ADAAAA] text-l w-fit text-nowrap">
+                MEMEBER SINCE
+              </h3>
+              <h2 className="text-[#F3FFCA] text-3xl font-extrabold w-fit text-nowrap">
+                {monthNames[new Date(user.createdAt).getMonth()].toUpperCase() +
+                  " " +
+                  new Date(user.createdAt).getFullYear()}
               </h2>
             </div>
+          </section>
+
+          {/* Stats */}
+          <section className="h-full w-full flex justify-around">
+            <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
+              <div className="bg-[#F3FFCA] absolute bottom-0 left-0 h-1 w-full"></div>
+              <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
+                WORKOUTS
+              </h2>
+              <p className="text-white font-black text-6xl">
+                {sessions === undefined
+                  ? "Loading..."
+                  : sessions.filter(
+                      (session: Session) => session.completed === true,
+                    ).length}
+              </p>
+            </article>
+            <article className="bg-[#1A1A1A] w-40 h-40 rounded-3xl flex flex-col p-5 items-center justify-around overflow-hidden relative">
+              <div className="bg-[#FF7441] absolute bottom-0 left-0 h-1 w-full"></div>
+              <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
+                STREAK
+              </h2>
+              <div className="flex gap-2 items-center">
+                <p className="text-white font-black text-6xl">
+                  {sessions === undefined
+                    ? "Loading..."
+                    : (() => {
+                        const completedDays = new Set(
+                          sessions
+                            .filter((s) => s.completed)
+                            .map((s) => new Date(s.date).toDateString()),
+                        );
+                        const today = new Date();
+                        const yesterday = new Date();
+                        yesterday.setDate(today.getDate() - 1);
+                        const todayKey = today.toDateString();
+                        const yesterdayKey = yesterday.toDateString();
+                        // Gate condition: must have today or yesterday
+                        if (
+                          !completedDays.has(todayKey) &&
+                          !completedDays.has(yesterdayKey)
+                        ) {
+                          return "0";
+                        }
+                        // Start from the most recent valid day (today if possible, else yesterday)
+                        const cursor = new Date(
+                          completedDays.has(todayKey) ? today : yesterday,
+                        );
+                        let streak = 0;
+                        while (completedDays.has(cursor.toDateString())) {
+                          streak++;
+                          cursor.setDate(cursor.getDate() - 1);
+                        }
+                        return streak;
+                      })()}
+                </p>
+                <img src="StreakIcon.png" alt="" className="h-10" />
+              </div>
+            </article>
           </section>
         </main>
       </div>

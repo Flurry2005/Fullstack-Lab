@@ -23,16 +23,12 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
   const { setSessions } = useSessions();
   const { logout } = useAuth();
 
-  console.log(session);
-  useEffect(() => {
-    (async () => {
-      const res = await updateSession(sessionData);
-      if (!res.success) {
-        logout();
-      }
-    })();
-  }, [sessionData]);
-
+  const updateSessionApi = async (s: Session) => {
+    const res = await updateSession(s);
+    if (!res.success) {
+      logout();
+    }
+  };
   return (
     <div className="bg-[#131313] p-5 rounded-2xl flex gap-5 flex-col">
       <section className=" flex flex-col md:flex-row gap-5 items-center h-fit md:h-35 w-full">
@@ -81,9 +77,9 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
       {showDetails && (
         <div className="flex flex-col gap-5">
           <section className="flex gap-10 flex-wrap justify-center">
-            {sessionData.exercices.map((exercice) => {
+            {sessionData.exercices.map((exercice, index: number) => {
               return (
-                <article className="h-fit">
+                <article className="h-fit" key={index}>
                   <p className="text-white tracking-tighter font-black border-b-2 w-fit mb-2">
                     {exercice.name.toUpperCase()}
                   </p>
@@ -106,21 +102,24 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value)) return;
-                                  setSessionData((prev) => ({
-                                    ...prev,
-                                    exercices: prev.exercices.map((ex) =>
-                                      ex === exercice
-                                        ? {
-                                            ...ex,
-                                            sets: ex.sets?.map((s, i) =>
-                                              i === index
-                                                ? { ...s, reps: value }
-                                                : s,
-                                            ),
-                                          }
-                                        : ex,
+                                  const updatedSession = {
+                                    ...sessionData,
+                                    exercices: sessionData.exercices.map(
+                                      (ex) =>
+                                        ex === exercice
+                                          ? {
+                                              ...ex,
+                                              sets: ex.sets?.map((s, i) =>
+                                                i === index
+                                                  ? { ...s, reps: value }
+                                                  : s,
+                                              ),
+                                            }
+                                          : ex,
                                     ),
-                                  }));
+                                  };
+                                  updateSession(updatedSession);
+                                  setSessionData(updatedSession);
                                 }}
                               />
                             </div>
@@ -135,30 +134,33 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                 onChange={(e) => {
                                   const value = Number(e.target.value);
                                   if (isNaN(value)) return;
-                                  setSessionData((prev) => ({
-                                    ...prev,
-                                    exercices: prev.exercices.map((ex) =>
-                                      ex === exercice
-                                        ? {
-                                            ...ex,
-                                            sets: ex.sets?.map((s, i) =>
-                                              i === index
-                                                ? { ...s, weight: value }
-                                                : s,
-                                            ),
-                                          }
-                                        : ex,
+                                  const updatedSession = {
+                                    ...sessionData,
+                                    exercices: sessionData.exercices.map(
+                                      (ex) =>
+                                        ex === exercice
+                                          ? {
+                                              ...ex,
+                                              sets: ex.sets?.map((s, i) =>
+                                                i === index
+                                                  ? { ...s, weight: value }
+                                                  : s,
+                                              ),
+                                            }
+                                          : ex,
                                     ),
-                                  }));
+                                  };
+                                  updateSession(updatedSession);
+                                  setSessionData(updatedSession);
                                 }}
                               />
                             </div>
                             <button
                               className="bg-red-400 px-2 py-1 rounded-4xl text-xs h-5 flex justify-center items-center text-white cursor-pointer"
                               onClick={() => {
-                                setSessionData((prev) => ({
-                                  ...prev,
-                                  exercices: prev.exercices.map((ex) =>
+                                const updatedSession = {
+                                  ...sessionData,
+                                  exercices: sessionData.exercices.map((ex) =>
                                     ex === exercice
                                       ? {
                                           ...ex,
@@ -168,7 +170,9 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                         }
                                       : ex,
                                   ),
-                                }));
+                                };
+                                updateSession(updatedSession);
+                                setSessionData(updatedSession);
                               }}
                             >
                               -
@@ -185,10 +189,9 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                             reps: 0,
                             weight: 0,
                           };
-
-                          setSessionData((prev) => ({
-                            ...prev,
-                            exercices: prev.exercices.map((ex) =>
+                          const updatedSession = {
+                            ...sessionData,
+                            exercices: sessionData.exercices.map((ex) =>
                               ex === exercice
                                 ? {
                                     ...ex,
@@ -196,7 +199,9 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                   }
                                 : ex,
                             ),
-                          }));
+                          };
+                          updateSession(updatedSession);
+                          setSessionData(updatedSession);
                         }}
                       >
                         + SET
@@ -209,17 +214,20 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
           </section>
           <GlowingButton
             onClick={() => {
-              setSessionData((prev) => ({
-                ...prev,
-                completed: !prev.completed,
-              }));
-              setSessions((prev: Session[]) =>
-                prev.map((sessionS: Session) =>
-                  sessionS._id === session._id
-                    ? { ...sessionData, completed: !sessionS.completed }
-                    : sessionS,
-                ),
-              );
+              const updatedSession = {
+                ...sessionData,
+                completed: !sessionData.completed,
+              };
+              updateSessionApi(updatedSession);
+
+              setSessionData(updatedSession);
+
+              setSessions((prev: Session[] | undefined) => {
+                if (!prev) return prev;
+                return prev.map((sessionS: Session) =>
+                  sessionS._id === session._id ? updatedSession : sessionS,
+                );
+              });
             }}
             outline={false}
             additionalClasses={`bg-none !bg-lime-400 rounded-2xl px-2 py-2 tracking-tighter font-black cursor-pointer text-[#4A5E00]! w-40! text-xs! ${!sessionData.completed ? "" : "!bg-red-400 text-red-500! hover:shadow-[0_0_15px_rgba(255,0,0,0.7),0_0_30px_rgba(255,100,100,0.6)]!"}`}

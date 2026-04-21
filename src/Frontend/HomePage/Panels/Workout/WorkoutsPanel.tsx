@@ -1,6 +1,6 @@
 import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
-import { act, use, useEffect, useMemo, useState, type JSX } from "react";
+import { useEffect, useMemo, useState, type JSX } from "react";
 import UpcommingSessions from "./Components/UpcommingSessions";
 import CreateWorkout from "./Components/Create/CreateWorkout";
 import PastSessions from "./Components/PastSessions";
@@ -10,9 +10,8 @@ import type { Session } from "../../../types/Session";
 import { getSessions } from "./Scripts/GetSessions";
 import { getWorkouts } from "./Scripts/GetWorkouts";
 import type { Workout } from "../../../types/Workout";
-import { SessionProvider, useSessions } from "../../../Context/useSessions";
+import { useSessions } from "../../../Context/useSessions";
 import { useAuth } from "../../../Context/useAuth";
-import { useNavigate } from "react-router-dom";
 
 export const Panel = {
   PAST: "PAST",
@@ -25,7 +24,7 @@ export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 function WorkoutsPanel() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.UPCOMMING);
 
-  const [exercices, setExercices] = useState<Exercice[]>([]);
+  const [exercices, setExercices] = useState<Exercice[] | undefined>(undefined);
   const { sessions, setSessions } = useSessions();
 
   const { logout } = useAuth();
@@ -36,6 +35,12 @@ function WorkoutsPanel() {
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
+
+    if (sessions === undefined)
+      return {
+        futureSessions: undefined,
+        pastSessions: undefined,
+      };
 
     for (const s of sessions) {
       const date = new Date(s.date);
@@ -54,7 +59,7 @@ function WorkoutsPanel() {
     };
   }, [sessions]);
 
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [workouts, setWorkouts] = useState<Workout[] | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -66,7 +71,6 @@ function WorkoutsPanel() {
       }
 
       const res = await getExercices();
-      fetchSessions();
       setExercices(res.data);
     })();
   }, []);
@@ -84,24 +88,24 @@ function WorkoutsPanel() {
     case Panel.UPCOMMING:
       activePanelElement = (
         <UpcommingSessions
-          sessions={futureSessions}
+          sessions={futureSessions!}
           updateSessions={fetchSessions}
-          workouts={workouts}
+          workouts={workouts!}
           updateWorkouts={setWorkouts}
         />
       );
       break;
 
     case Panel.CREATE:
-      activePanelElement = <CreateWorkout exercices={exercices} />;
+      activePanelElement = <CreateWorkout exercices={exercices!} />;
       break;
 
     case Panel.PAST:
       activePanelElement = (
         <PastSessions
-          sessions={pastSessions}
+          sessions={pastSessions!}
           updateSessions={fetchSessions}
-          workouts={workouts}
+          workouts={workouts!}
           updateWorkouts={setWorkouts}
         />
       );
@@ -110,9 +114,9 @@ function WorkoutsPanel() {
     default:
       activePanelElement = (
         <UpcommingSessions
-          sessions={futureSessions}
+          sessions={futureSessions!}
           updateSessions={fetchSessions}
-          workouts={workouts}
+          workouts={workouts!}
           updateWorkouts={setWorkouts}
         />
       );
@@ -141,57 +145,59 @@ function WorkoutsPanel() {
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
                   <h2 className="text-[#ADAAAA] text-xs">THIS MONTH</h2>
                   <p className="text-[#F3FFCA] font-black text-xl">
-                    {
-                      sessions.filter(
-                        (s) =>
-                          new Date(s.date).getMonth() ===
-                            new Date().getMonth() &&
-                          new Date(s.date).getFullYear() ===
-                            new Date().getFullYear() &&
-                          s.completed,
-                      ).length
-                    }
+                    {sessions === undefined
+                      ? "Loading..."
+                      : sessions.filter(
+                          (s) =>
+                            new Date(s.date).getMonth() ===
+                              new Date().getMonth() &&
+                            new Date(s.date).getFullYear() ===
+                              new Date().getFullYear() &&
+                            s.completed,
+                        ).length}
                   </p>
                 </article>
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center gap-1">
                   <h2 className="text-[#ADAAAA] text-xs">STREAK</h2>
                   <p className="text-[#FF7441] font-black text-xl">
-                    {(() => {
-                      const completedDays = new Set(
-                        [...sessions, ...pastSessions]
-                          .filter((s) => s.completed)
-                          .map((s) => new Date(s.date).toDateString()),
-                      );
+                    {sessions === undefined
+                      ? "Loading..."
+                      : (() => {
+                          const completedDays = new Set(
+                            [...sessions, ...pastSessions!]
+                              .filter((s) => s.completed)
+                              .map((s) => new Date(s.date).toDateString()),
+                          );
 
-                      const today = new Date();
-                      const yesterday = new Date();
-                      yesterday.setDate(today.getDate() - 1);
+                          const today = new Date();
+                          const yesterday = new Date();
+                          yesterday.setDate(today.getDate() - 1);
 
-                      const todayKey = today.toDateString();
-                      const yesterdayKey = yesterday.toDateString();
+                          const todayKey = today.toDateString();
+                          const yesterdayKey = yesterday.toDateString();
 
-                      // Gate condition: must have today or yesterday
-                      if (
-                        !completedDays.has(todayKey) &&
-                        !completedDays.has(yesterdayKey)
-                      ) {
-                        return "0d";
-                      }
+                          // Gate condition: must have today or yesterday
+                          if (
+                            !completedDays.has(todayKey) &&
+                            !completedDays.has(yesterdayKey)
+                          ) {
+                            return "0d";
+                          }
 
-                      // Start from the most recent valid day (today if possible, else yesterday)
-                      const cursor = new Date(
-                        completedDays.has(todayKey) ? today : yesterday,
-                      );
+                          // Start from the most recent valid day (today if possible, else yesterday)
+                          const cursor = new Date(
+                            completedDays.has(todayKey) ? today : yesterday,
+                          );
 
-                      let streak = 0;
+                          let streak = 0;
 
-                      while (completedDays.has(cursor.toDateString())) {
-                        streak++;
-                        cursor.setDate(cursor.getDate() - 1);
-                      }
+                          while (completedDays.has(cursor.toDateString())) {
+                            streak++;
+                            cursor.setDate(cursor.getDate() - 1);
+                          }
 
-                      return streak + "d";
-                    })()}
+                          return streak + "d";
+                        })()}
                   </p>
                 </article>
               </div>
@@ -242,7 +248,11 @@ function WorkoutsPanel() {
             </GlowingButton>
           </div>
         </section>
-        {sessions === undefined ? "Loading..." : activePanelElement}
+        {sessions === undefined ||
+        workouts === undefined ||
+        exercices === undefined
+          ? "Loading..."
+          : activePanelElement}
       </main>
     </div>
   );
