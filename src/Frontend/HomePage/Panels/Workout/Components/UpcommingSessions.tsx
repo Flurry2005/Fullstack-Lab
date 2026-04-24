@@ -59,7 +59,7 @@ function UpcommingSessions({
       </GlowingButton>
       <article className="hidden xl:block w-80 h-100 rounded-2xl bg-[#131313] overflow-hidden relative">
         <span className="absolute top-3 left-3 bg-[#FF7441] rounded-2xl px-2 py-1 text-xs tracking-tighter font-black text-[#410F00]">
-          NEXT SESSION
+          {sessions[0] ? "NEXT SESSION" : "NO UPCOMMING SESSION"}
         </span>
         <div className="w-full h-52 absolute left-0 bg-linear-to-b from-black-100/20 to-[#131313]/90"></div>
         <img src="PlaceholderGym.png" alt="" className="mb-15" />
@@ -103,10 +103,10 @@ function UpcommingSessions({
                   : "No Upcoming Session"}
               </p>
             </div>
-            <div className="flex">
+            {/* <div className="flex">
               <img src="ClockIcon.png" alt="" className="h-4 mr-2" />
               <p className="text-[#ADAAAA] text-xs">06:30 AM</p>
-            </div>
+            </div> */}
           </div>
           <article className="bg-[#1A1A1A] w-full h-20 rounded-3xl relative mt-5 overflow-hidden p-6 flex gap-6 justify-between items-center">
             <span className="w-full h-20 absolute left-0 top-0 border-[#F3FFCA] border-l-4"></span>

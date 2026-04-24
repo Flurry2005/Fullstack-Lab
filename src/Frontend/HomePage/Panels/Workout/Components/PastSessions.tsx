@@ -31,6 +31,21 @@ function PastSessions({
       logout();
     }
   };
+  const latestSession: Session | undefined = sessions?.reduce(
+    (closest, session) => {
+      const now = Date.now();
+      const sessionTime = new Date(session.date).getTime();
+
+      if (sessionTime > now || !session.completed) return closest;
+
+      if (!closest) return session;
+
+      const closestTime = new Date(closest.date).getTime();
+
+      return sessionTime > closestTime ? session : closest;
+    },
+    undefined as Session | undefined,
+  );
 
   const monthNames = [
     "Jan",
@@ -58,30 +73,31 @@ function PastSessions({
       </GlowingButton>
       <article className="w-80 h-100 rounded-2xl bg-[#131313] overflow-hidden relative">
         <span className="absolute top-3 left-3 bg-[#FF7441] rounded-2xl px-2 py-1 text-xs tracking-tighter font-black text-[#410F00]">
-          PREVIOUS SESSION
+          {latestSession ? "PREVIOUS SESSION" : "NO PREVIOUS SESSION"}
         </span>
         <div className="w-full h-52 absolute left-0 bg-linear-to-b from-black-100/20 to-[#131313]/90"></div>
         <img src="PlaceholderGym.png" alt="" className="mb-15" />
         <div className="px-5">
           <h2 className="text-white font-black tracking-tighter text-4xl absolute top-45">
-            {workouts.find((workout) => workout._id === sessions[0]?.workoutId)
-              ?.workoutName || "No Upcomming Session"}
+            {workouts.find(
+              (workout) => workout._id === latestSession?.workoutId,
+            )?.workoutName || "No Upcomming Session"}
           </h2>
           <div className="flex items-center gap-10">
             <div className="flex">
               <img src="CalenderIcon.png" alt="" className="h-4 mr-2" />
               <p className="text-[#ADAAAA] text-xs">
-                {sessions.length > 0
+                {latestSession
                   ? (() => {
                       const now = new Date();
-                      const sessionDate = new Date(sessions[0]?.date);
+                      const sessionDate = new Date(latestSession.date);
 
-                      // Strip time (IMPORTANT)
                       const today = new Date(
                         now.getFullYear(),
                         now.getMonth(),
                         now.getDate(),
                       );
+
                       const target = new Date(
                         sessionDate.getFullYear(),
                         sessionDate.getMonth(),
@@ -94,19 +110,18 @@ function PastSessions({
                       );
 
                       if (diffDays === 0) return "TODAY";
-                      if (diffDays === 1) return "TOMORROW";
-                      if (diffDays > 1) return `IN ${diffDays} DAYS`;
                       if (diffDays === -1) return "YESTERDAY";
 
-                      return `${Math.abs(diffDays)} DAYS AGO`;
+                      const days = Math.abs(diffDays);
+                      return `${days} DAY${days > 1 ? "S" : ""} AGO`;
                     })()
-                  : "No Upcoming Session"}
+                  : "No Previous Session"}
               </p>
             </div>
-            <div className="flex">
+            {/* <div className="flex">
               <img src="ClockIcon.png" alt="" className="h-4 mr-2" />
               <p className="text-[#ADAAAA] text-xs">06:30 AM</p>
-            </div>
+            </div> */}
           </div>
           <article className="bg-[#1A1A1A] w-full h-20 rounded-3xl relative mt-5 overflow-hidden p-6 flex gap-6 justify-between items-center">
             <span className="w-full h-20 absolute left-0 top-0 border-[#F3FFCA] border-l-4"></span>
@@ -114,7 +129,7 @@ function PastSessions({
               <p className="text-[#ADAAAA] text-xs">FOCUS</p>
               <h2 className="text-white">
                 {workouts.find(
-                  (workout) => workout._id === sessions[0]?.workoutId,
+                  (workout) => workout._id === latestSession?.workoutId,
                 )?.tags || "No Upcomming Session"}
               </h2>
             </div>

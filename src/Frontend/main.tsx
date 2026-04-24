@@ -22,11 +22,7 @@ const router = createBrowserRouter([
         element: <Home panel={Panel.WORKOUTS} />,
       },
       {
-        path: "/progress",
-        element: <Home panel={Panel.PROGRESS} />,
-      },
-      {
-        path: "/profile",
+        path: "/profile/:username",
         element: <Home panel={Panel.PROFILE} />,
       },
       {

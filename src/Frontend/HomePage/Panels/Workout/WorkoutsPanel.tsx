@@ -12,6 +12,7 @@ import { getWorkouts } from "./Scripts/GetWorkouts";
 import type { Workout } from "../../../types/Workout";
 import { useSessions } from "../../../Context/useSessions";
 import { useAuth } from "../../../Context/useAuth";
+import { useWorkouts } from "../../../Context/useWorkouts";
 
 export const Panel = {
   PAST: "PAST",
@@ -59,17 +60,10 @@ function WorkoutsPanel() {
     };
   }, [sessions]);
 
-  const [workouts, setWorkouts] = useState<Workout[] | undefined>(undefined);
+  const { workouts, setWorkouts } = useWorkouts();
 
   useEffect(() => {
     (async () => {
-      const res1 = await getWorkouts();
-      if (res1.success) {
-        setWorkouts(res1.data);
-      } else {
-        logout();
-      }
-
       const res = await getExercices();
       setExercices(res.data);
     })();
@@ -132,7 +126,7 @@ function WorkoutsPanel() {
                 ? "MAKE A WORKOUT"
                 : "TRAINING HISTORY"}
             </p>
-            <h2 className="text-white text-7xl font-black w-min flex-wrap">
+            <h2 className="text-white text-6xl font-black w-min flex-wrap tracking-tighter leading-12">
               {activePanel === Panel.CREATE ? "CREATE WORKOUT" : "SESSION LOGS"}
             </h2>
             <div className="flex md:flex-row flex-col justify-between md:gap-20 gap-5 w-full">

@@ -6,12 +6,14 @@ import GlowingButton from "../Components/General/GlowingButton";
 import WorkoutsPanel from "./Panels/Workout/WorkoutsPanel";
 import { SessionProvider } from "../Context/useSessions";
 import { Link } from "react-router-dom";
+import HomePanel from "./HomePanel";
+import { WorkoutProvider } from "../Context/useWorkouts";
+import { useParams } from "react-router-dom";
 
 export const Panel = {
   HOME: "HOME",
   DASHBOARD: "DASHBOARD",
   WORKOUTS: "WORKOUTS",
-  PROGRESS: "PROGRESS",
   PROFILE: "PROFILE",
 } as const;
 
@@ -24,35 +26,48 @@ interface Props {
 function Home({ panel }: Props) {
   const { user } = useAuth();
   const [activePanel, setActivePanel] = useState<ActivePanel>(panel);
+  const { username } = useParams();
 
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
-    <DashboardPanel />,
+    <HomePanel />,
   );
 
   useEffect(() => {
     switch (activePanel) {
+      case Panel.HOME: {
+        setActivePanelElement(<HomePanel />);
+        break;
+      }
       case Panel.PROFILE: {
         setActivePanelElement(
           <SessionProvider>
-            <ProfilePanel />
+            <ProfilePanel username={username!} />
           </SessionProvider>,
         );
         break;
       }
       case Panel.DASHBOARD: {
-        setActivePanelElement(<DashboardPanel />);
+        setActivePanelElement(
+          <WorkoutProvider>
+            <SessionProvider>
+              <DashboardPanel />
+            </SessionProvider>
+          </WorkoutProvider>,
+        );
         break;
       }
       case Panel.WORKOUTS: {
         setActivePanelElement(
-          <SessionProvider>
-            <WorkoutsPanel />
-          </SessionProvider>,
+          <WorkoutProvider>
+            <SessionProvider>
+              <WorkoutsPanel />
+            </SessionProvider>
+          </WorkoutProvider>,
         );
         break;
       }
       default: {
-        setActivePanelElement(<DashboardPanel />);
+        setActivePanelElement(<HomePanel />);
       }
     }
   }, [activePanel]);
@@ -60,12 +75,12 @@ function Home({ panel }: Props) {
   return (
     <>
       <main className="w-screen min-h-screen flex flex-col md:flex-row">
-        <aside className="bg-[#131313] md:w-60 md:min-h-screen px-5 pt-5 gap-10 flex flex-col">
+        <aside className="bg-[#131313] md:w-70 md:min-h-screen px-5 pt-5 gap-10 flex flex-col z-10">
           <div>
             <h1 className="text-[#CCFF00] italic text-xl ">KINETIC</h1>
             <p className="text-[#ADAAAA] text-[8px]">ELITE PERFORMANCE</p>
           </div>
-          <nav>
+          <nav className="flex flex-col w-full">
             {!user ? (
               <Link
                 to={"/"}
@@ -91,30 +106,6 @@ function Home({ panel }: Props) {
               </Link>
             ) : (
               <>
-                <Link
-                  to={"/"}
-                  onClick={() => setActivePanel(Panel.HOME)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.HOME ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
-                >
-                  <div
-                    className={`h-4 w-4 ${
-                      activePanel === Panel.HOME
-                        ? "bg-[#CCFF00]"
-                        : "bg-gray-400"
-                    }`}
-                    style={{
-                      WebkitMaskImage: "url(/dashboardIcon.png)",
-                      maskImage: "url(/dashboardIcon.png)",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  />
-                  Home
-                </Link>
                 <Link
                   to={"/dashboard"}
                   onClick={() => setActivePanel(Panel.DASHBOARD)}
@@ -163,32 +154,9 @@ function Home({ panel }: Props) {
                   />
                   Workouts
                 </Link>
+
                 <Link
-                  to={"/progress"}
-                  onClick={() => setActivePanel(Panel.PROGRESS)}
-                  className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROGRESS ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
-                >
-                  <div
-                    className={`h-4 w-4 ${
-                      activePanel === Panel.PROGRESS
-                        ? "bg-[#CCFF00]"
-                        : "bg-gray-400"
-                    }`}
-                    style={{
-                      WebkitMaskImage: "url(/progressIcon.png)",
-                      maskImage: "url(/progressIcon.png)",
-                      WebkitMaskRepeat: "no-repeat",
-                      maskRepeat: "no-repeat",
-                      WebkitMaskSize: "contain",
-                      maskSize: "contain",
-                      WebkitMaskPosition: "center",
-                      maskPosition: "center",
-                    }}
-                  />
-                  Progress
-                </Link>
-                <Link
-                  to={"/profile"}
+                  to={"/profile/" + user.username}
                   onClick={() => setActivePanel(Panel.PROFILE)}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROFILE ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
@@ -218,14 +186,16 @@ function Home({ panel }: Props) {
             <GlowingButton
               outline={false}
               onClick={() => setActivePanel(Panel.WORKOUTS)}
-              additionalClasses="bg-none bg-[#CAFD00] font-black tracking-tighter text-xs !text-[#4A5E00] self-center mb-5 md:m-0"
+              additionalClasses="bg-none bg-[#CAFD00] font-black tracking-tighter text-xs !text-[#4A5E00] self-center mb-5 md:m-0 w-full!"
             >
               + LOG NEW WORKOUT
             </GlowingButton>
           )}
         </aside>
-        <section className="bg-[#0E0E0E] w-full min-h-full pb-10">
-          {(user && activePanelElement) || <DashboardPanel />}
+        <section className="bg-[#0E0E0E] w-full min-h-full ">
+          {!user && username && activePanel === Panel.PROFILE
+            ? activePanelElement
+            : (user && activePanelElement) || <HomePanel />}
         </section>
       </main>
     </>

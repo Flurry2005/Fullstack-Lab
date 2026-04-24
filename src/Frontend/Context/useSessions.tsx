@@ -8,6 +8,7 @@ import {
 } from "react";
 import type { Session } from "../types/Session";
 import { getSessions } from "../HomePage/Panels/Workout/Scripts/GetSessions";
+import { useAuth } from "./useAuth";
 
 type SessionContextType = {
   sessions: Session[] | undefined;
@@ -18,12 +19,17 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [sessions, setSessions] = useState<Session[] | undefined>(undefined);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     (async () => {
+      if (!user) return;
       const res = await getSessions();
 
-      if (!res.success) return;
+      if (!res.success) {
+        logout;
+        return;
+      }
 
       setSessions(res.data);
     })();

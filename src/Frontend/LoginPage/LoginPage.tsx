@@ -16,7 +16,7 @@ function LoginPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_50%,rgba(255,255,255,0.15),transparent_40%)]"></div>
       <div className="relative z-10 w-full h-full flex justify-center items-center">
         <div className="absolute w-9/10  h-7/10 rounded-2xl blur-2xl z-0"></div>
-        <main className="w-9/10 max-w-250  h-7/10 rounded-2xl shadow-amber-50/10 shadow-[0px_0px_26px_7px_rgba(0,_0,_0,_0.1)] flex overflow-hidden z-1">
+        <main className="w-9/10 max-w-250  h-7/10 rounded-r-2xl shadow-amber-50/10 shadow-[0px_0px_26px_7px_rgba(0,0,0,0.1)] flex overflow-hidden z-1">
           <section className="w-6/10 h-full text-white px-10 py-10 gap-5 flex flex-col">
             <h1 className="text-[#F3FFCA] text-4xl font-extrabold">KINETIC</h1>
             <h2 className="text-8xl font-extrabold">
@@ -64,7 +64,7 @@ function LoginPage() {
 
                   if (res.success) {
                     login(res.data);
-                    navigate("/");
+                    navigate("/dashboard");
                   }
                 } else {
                   const fullname = formData.get("fullname")?.toString();

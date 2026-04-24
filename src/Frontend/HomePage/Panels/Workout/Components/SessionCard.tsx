@@ -118,7 +118,15 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                           : ex,
                                     ),
                                   };
-                                  updateSession(updatedSession);
+                                  updateSessionApi(updatedSession);
+                                  setSessions((prev: Session[] | undefined) => {
+                                    if (!prev) return prev;
+                                    return prev.map((sessionS: Session) =>
+                                      sessionS._id === session._id
+                                        ? updatedSession
+                                        : sessionS,
+                                    );
+                                  });
                                   setSessionData(updatedSession);
                                 }}
                               />
@@ -150,7 +158,15 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                           : ex,
                                     ),
                                   };
-                                  updateSession(updatedSession);
+                                  updateSessionApi(updatedSession);
+                                  setSessions((prev: Session[] | undefined) => {
+                                    if (!prev) return prev;
+                                    return prev.map((sessionS: Session) =>
+                                      sessionS._id === session._id
+                                        ? updatedSession
+                                        : sessionS,
+                                    );
+                                  });
                                   setSessionData(updatedSession);
                                 }}
                               />
@@ -171,7 +187,15 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                       : ex,
                                   ),
                                 };
-                                updateSession(updatedSession);
+                                updateSessionApi(updatedSession);
+                                setSessions((prev: Session[] | undefined) => {
+                                  if (!prev) return prev;
+                                  return prev.map((sessionS: Session) =>
+                                    sessionS._id === session._id
+                                      ? updatedSession
+                                      : sessionS,
+                                  );
+                                });
                                 setSessionData(updatedSession);
                               }}
                             >
@@ -200,7 +224,15 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                                 : ex,
                             ),
                           };
-                          updateSession(updatedSession);
+                          updateSessionApi(updatedSession);
+                          setSessions((prev: Session[] | undefined) => {
+                            if (!prev) return prev;
+                            return prev.map((sessionS: Session) =>
+                              sessionS._id === session._id
+                                ? updatedSession
+                                : sessionS,
+                            );
+                          });
                           setSessionData(updatedSession);
                         }}
                       >

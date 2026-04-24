@@ -37,3 +37,6 @@ router.patch(
     userController.updateSession(req, res);
   },
 );
+router.get("/profile/:username", (req, res, next) => {
+  userController.getProfile(req, res);
+});
