@@ -13,30 +13,7 @@ router.post("/register", (req, res, next) => {
 router.post("/update-user", (req, res, next) => {
   userController.updateUser(req, res);
 });
-router.post(
-  "/create-workout",
-  jwtMiddleware.jwtTokenIsValid,
-  (req, res, next) => {
-    userController.createWorkout(req, res);
-  },
-);
-router.get("/get-workouts", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
-  userController.getWorkouts(req, res);
-});
-router.get("/get-sessions", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
-  userController.getSessions(req, res);
-});
 
-router.post("/add-session", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
-  userController.addSession(req, res);
-});
-router.patch(
-  "/update-session",
-  jwtMiddleware.jwtTokenIsValid,
-  (req, res, next) => {
-    userController.updateSession(req, res);
-  },
-);
 router.get("/profile/:username", (req, res, next) => {
   userController.getProfile(req, res);
 });
