@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const exerciceSchema = new mongoose.Schema({
+export const exerciceSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -20,6 +20,11 @@ const exerciceSchema = new mongoose.Schema({
     type: [String],
     required: true,
     minlength: 1,
+  },
+  sets: {
+    type: [],
+    required: false,
+    default: undefined,
   },
 });
 

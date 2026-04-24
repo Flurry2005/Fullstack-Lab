@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { exerciceSchema } from "./exerciceModel.ts";
 
 const sessionsSchema = new mongoose.Schema({
   userId: {
@@ -18,7 +19,7 @@ const sessionsSchema = new mongoose.Schema({
     required: true,
   },
   exercices: {
-    type: [],
+    type: [exerciceSchema],
   },
 });
 

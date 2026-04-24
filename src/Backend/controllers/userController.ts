@@ -12,7 +12,9 @@ class UserController {
     const { email, password } = req.body;
     const user = await Users.findOne({ email: email });
     if (!user)
-      return res.status(300).json({ success: false, data: "Email not found!" });
+      return res
+        .status(401)
+        .json({ success: false, data: "Invalid credentials!" });
 
     if (await bcrypt.compare(password, user.passwordHash)) {
       const userObj = user.toObject();
@@ -30,7 +32,7 @@ class UserController {
     } else {
       return res
         .status(401)
-        .json({ success: false, error: "Incorrect password!" });
+        .json({ success: false, error: "Invalid credentials!" });
     }
   }
   async register(req: Request<{}, {}, RegisterBody>, res: Response) {
@@ -54,25 +56,34 @@ class UserController {
 
     return res
       .status(200)
-      .json({ succes: true, data: "Account successfully registered!" });
+      .json({ success: true, data: "Account successfully registered!" });
   }
   async updateUser(req: Request<{}, {}, User>, res: Response) {
     const user = req.body as User;
+
+    //Ensure no malicious Request
     if (
-      !(await Users.findOne({ username: user.username, email: user.email }))
+      res.locals.jwt.username !== user.username ||
+      res.locals.jwt.email !== user.email ||
+      res.locals.jwt.userId !== user._id
     ) {
-      return res
-        .status(409)
-        .json({ success: false, error: "Username or email doesnt exists!" });
+      return res.status(403).json({
+        success: false,
+        error: "You're not authorized to perform this action!",
+      });
+    }
+
+    if (!(await Users.findById(new ObjectId(res.locals.jwt.userId)))) {
+      return res.status(404).json({ success: false, error: "User not found!" });
     }
     await Users.updateOne(
-      { _id: new ObjectId(user._id) },
-      { $set: { ...user } },
+      { _id: new ObjectId(res.locals.jwt.userId) },
+      { $set: { bio: user.bio, profilePicture: user.profilePicture } },
     );
 
     return res
       .status(200)
-      .json({ succes: true, data: "Account successfully updated!" });
+      .json({ success: true, data: "Account successfully updated!" });
   }
   async getProfile(req: Request<{ username: string }, {}, any>, res: Response) {
     const username = req.params.username;
@@ -115,11 +126,10 @@ class UserController {
     let longest = 1;
     let current = 1;
     let streak = 0;
-    // Gate condition: must have today or yesterday
+
     if (!completedDays.has(todayKey) && !completedDays.has(yesterdayKey)) {
       streak = 0;
     } else {
-      // Start from the most recent valid day (today if possible, else yesterday)
       const cursor = new Date(completedDays.has(todayKey) ? today : yesterday);
 
       while (completedDays.has(cursor.toDateString())) {
@@ -153,15 +163,15 @@ class UserController {
     return res.status(200).json({
       success: true,
       data: {
-        fullname: user?.fullname,
+        fullname: user.fullname,
         username: user.username,
-        bio: user?.bio,
+        bio: user.bio,
         volume: volume,
         workouts: sessions.filter((workout) => workout.completed === true)
           .length,
         streak: streak,
         beststreak: longest,
-        profilePicture: user?.profilePicture,
+        profilePicture: user.profilePicture,
         membersince: user.createdAt,
       },
     });

@@ -8,6 +8,6 @@ router.get(
   "/get-exercices",
   jwtMiddleware.jwtTokenIsValid,
   (req, res, next) => {
-    exerciceController.getWorkouts(req, res);
+    exerciceController.getExercices(req, res);
   },
 );

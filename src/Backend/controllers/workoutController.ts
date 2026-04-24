@@ -16,10 +16,10 @@ class WorkoutController {
         tags: tags!,
         exercices: exercices,
       });
-      return res.status(200).json({ success: true, data: "Workout Created" });
+      return res.status(201).json({ success: true, data: "Workout Created" });
     }
 
-    return res.status(404).json({ succes: false, error: "User not found!" });
+    return res.status(404).json({ success: false, error: "User not found!" });
   }
   async getWorkouts(req: Request<{}, {}, any>, res: Response) {
     const userId = new ObjectId(res.locals.jwt.userId) as ObjectId;
@@ -30,7 +30,7 @@ class WorkoutController {
       return res.status(200).json({ success: true, data: workouts });
     }
 
-    return res.status(404).json({ succes: false, error: "User not found!" });
+    return res.status(404).json({ success: false, error: "User not found!" });
   }
 }
 

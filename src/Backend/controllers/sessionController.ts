@@ -13,7 +13,7 @@ class SessionController {
       return res.status(200).json({ success: true, data: workouts });
     }
 
-    return res.status(404).json({ succes: false, error: "User not found!" });
+    return res.status(404).json({ success: false, error: "User not found!" });
   }
 
   async addSession(req: Request<{}, {}, any>, res: Response) {
@@ -25,7 +25,7 @@ class SessionController {
       if (!workout)
         return res
           .status(404)
-          .json({ succes: false, error: "Workout not found!" });
+          .json({ success: false, error: "Workout not found!" });
 
       await Sessions.insertOne({
         userId: res.locals.jwt.userId,
@@ -34,10 +34,10 @@ class SessionController {
         date: new Date(date),
         exercices: workout.exercices,
       });
-      return res.status(200).json({ success: true, data: "Session added" });
+      return res.status(201).json({ success: true, data: "Session added" });
     }
 
-    return res.status(404).json({ succes: false, error: "User not found!" });
+    return res.status(404).json({ success: false, error: "User not found!" });
   }
   async updateSession(req: Request<{}, {}, UpdateSessionBody>, res: Response) {
     const { session } = req.body;
@@ -45,7 +45,7 @@ class SessionController {
     const user = await Users.findOne({ _id: userId });
     if (user && res.locals.jwt.userId === session.userId) {
       await Sessions.updateOne(
-        { _id: new ObjectId(session._id) },
+        { _id: new ObjectId(session._id), userId: res.locals.jwt.userId },
         {
           $set: {
             completed: session.completed,
@@ -56,7 +56,7 @@ class SessionController {
       return res.status(200).json({ success: true, data: "Session updated" });
     }
 
-    return res.status(404).json({ succes: false, error: "User not found!" });
+    return res.status(404).json({ success: false, error: "User not found!" });
   }
 }
 type UpdateSessionBody = {
