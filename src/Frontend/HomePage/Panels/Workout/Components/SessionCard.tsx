@@ -174,29 +174,36 @@ function SessionCard({ session, day, month, year, workout, tags }: Props) {
                             <button
                               className="bg-red-400 px-2 py-1 rounded-4xl text-xs h-5 flex justify-center items-center text-white cursor-pointer"
                               onClick={() => {
-                                const updatedSession = {
-                                  ...sessionData,
-                                  exercices: sessionData.exercices.map((ex) =>
-                                    ex === exercice
-                                      ? {
-                                          ...ex,
-                                          sets: ex.sets?.filter(
-                                            (_, i) => i !== index,
-                                          ),
-                                        }
-                                      : ex,
-                                  ),
-                                };
-                                updateSessionApi(updatedSession);
-                                setSessions((prev: Session[] | undefined) => {
-                                  if (!prev) return prev;
-                                  return prev.map((sessionS: Session) =>
-                                    sessionS._id === session._id
-                                      ? updatedSession
-                                      : sessionS,
-                                  );
-                                });
-                                setSessionData(updatedSession);
+                                if (
+                                  window.confirm(
+                                    "Are you sure you want to remove the set?",
+                                  )
+                                ) {
+                                  const updatedSession = {
+                                    ...sessionData,
+                                    exercices: sessionData.exercices.map(
+                                      (ex) =>
+                                        ex === exercice
+                                          ? {
+                                              ...ex,
+                                              sets: ex.sets?.filter(
+                                                (_, i) => i !== index,
+                                              ),
+                                            }
+                                          : ex,
+                                    ),
+                                  };
+                                  updateSessionApi(updatedSession);
+                                  setSessions((prev: Session[] | undefined) => {
+                                    if (!prev) return prev;
+                                    return prev.map((sessionS: Session) =>
+                                      sessionS._id === session._id
+                                        ? updatedSession
+                                        : sessionS,
+                                    );
+                                  });
+                                  setSessionData(updatedSession);
+                                }
                               }}
                             >
                               -
