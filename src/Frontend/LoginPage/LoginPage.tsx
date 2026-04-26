@@ -9,6 +9,8 @@ import { useAuth } from "../Context/useAuth";
 function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [serverMessage, setServerMessage] = useState<string>("");
+  const [requestSuccess, setRequestSuccess] = useState<boolean>(false);
   const [loginMode, setLoginMode] = useState(true);
   return (
     <div className=" bg-[#0f172a] relative overflow-hidden w-screen">
@@ -64,7 +66,11 @@ function LoginPage() {
 
                   if (res.success) {
                     login(res.data);
+                    setServerMessage("");
                     navigate("/dashboard");
+                  } else {
+                    setRequestSuccess(false);
+                    setServerMessage(res.error);
                   }
                 } else {
                   const fullname = formData.get("fullname")?.toString();
@@ -72,7 +78,19 @@ function LoginPage() {
                   const email = formData.get("email")?.toString();
                   const password = formData.get("password")?.toString();
 
-                  await Register(fullname!, username!, email!, password!);
+                  const res = await Register(
+                    fullname!,
+                    username!,
+                    email!,
+                    password!,
+                  );
+                  if (res.success) {
+                    setRequestSuccess(true);
+                    setServerMessage("Your account has been registered!");
+                  } else {
+                    setRequestSuccess(false);
+                    setServerMessage(res.error);
+                  }
                 }
               }}
               method="POST"
@@ -141,6 +159,11 @@ function LoginPage() {
                   additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs  text-white text-xs"
                 ></InputField>
               </div>
+              <p
+                className={`font-black text-center text-xs ${requestSuccess ? "text-green-500" : "text-red-500"}`}
+              >
+                {serverMessage.toUpperCase()}
+              </p>
               <GlowingButton
                 outline={false}
                 onClick={() => {}}

@@ -7,7 +7,7 @@ export const exerciceSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     minlength: 2,
-    maxlength: 20,
+    maxlength: 120,
   },
   type: {
     type: String,
