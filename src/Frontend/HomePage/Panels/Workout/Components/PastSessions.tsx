@@ -149,6 +149,7 @@ function PastSessions({ sessions, workouts, updateWorkouts }: Props) {
               session={session}
               day={day.toString()}
               month={month}
+              key={session._id}
               year={year.toString()}
               workout={workout!}
               tags={workout?.tags!}

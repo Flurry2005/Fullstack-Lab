@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useState } from "react";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import type { Session } from "../../../../types/Session";
 import { updateSession } from "../Scripts/UpdateSession";

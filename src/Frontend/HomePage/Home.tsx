@@ -42,7 +42,7 @@ function Home({ panel }: Props) {
       case Panel.PROFILE: {
         setActivePanelElement(
           <SessionProvider>
-            <ProfilePanel username={username!} />
+            <ProfilePanel />
           </SessionProvider>,
         );
         break;
@@ -161,7 +161,9 @@ function Home({ panel }: Props) {
 
                 <Link
                   to={"/profile/" + user.username}
-                  onClick={() => setActivePanel(Panel.PROFILE)}
+                  onClick={() => {
+                    setActivePanel(Panel.PROFILE);
+                  }}
                   className={`w-full h-10 flex px-2 gap-2 items-center cursor-pointer ${activePanel === Panel.PROFILE ? "text-[#CCFF00] border-l-2 rounded bg-[#1A1A1A]" : "text-[#ADAAAA]"}`}
                 >
                   <div

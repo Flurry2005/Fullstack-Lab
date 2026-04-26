@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InputField from "../Components/General/InputField";
 import GlowingButton from "../Components/General/GlowingButton";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Login } from "./Login";
 import { Register } from "./Register";
 import { useAuth } from "../Context/useAuth";
@@ -72,12 +72,7 @@ function LoginPage() {
                   const email = formData.get("email")?.toString();
                   const password = formData.get("password")?.toString();
 
-                  const res = await Register(
-                    fullname!,
-                    username!,
-                    email!,
-                    password!,
-                  );
+                  await Register(fullname!, username!, email!, password!);
                 }
               }}
               method="POST"

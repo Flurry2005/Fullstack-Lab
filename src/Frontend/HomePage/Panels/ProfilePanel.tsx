@@ -5,10 +5,7 @@ import { useSessions } from "../../Context/useSessions";
 import type { Session } from "../../types/Session.ts";
 import { formatWeight } from "../../utils/FormatWeight.ts";
 import { updateUser } from "./Workout/Scripts/UpdateUser.ts";
-
-interface Props {
-  username: string;
-}
+import { useParams } from "react-router-dom";
 
 type OtherProfile = {
   fullname: string;
@@ -22,15 +19,14 @@ type OtherProfile = {
   membersince: string;
 };
 
-function ProfilePanel({ username }: Props) {
+function ProfilePanel() {
   const { user, login } = useAuth();
-
   const [bio, setBio] = useState<string>(
     user?.bio ||
       "Hybrid Athlete. Pushing the boundaries of human performance through data-driven strength and endurance protocols.",
   );
+  const { username } = useParams();
 
-  console.log(username !== user?.username);
   const otherProfile = username !== user?.username;
 
   const [otherUser, setOtherUser] = useState<OtherProfile | undefined>(
@@ -123,6 +119,34 @@ function ProfilePanel({ username }: Props) {
     reader.readAsDataURL(file);
   };
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const resizeTextarea = () => {
+    if (!textareaRef.current) return;
+
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+
+    const resizeTextarea = () => {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    };
+
+    const observer = new ResizeObserver(() => {
+      resizeTextarea();
+    });
+
+    observer.observe(el);
+
+    resizeTextarea();
+
+    return () => observer.disconnect();
+  }, []);
+
   if (!user && !username)
     return (
       <>
@@ -149,9 +173,11 @@ function ProfilePanel({ username }: Props) {
               <div className="lg:self-end self-center relative">
                 <img
                   src={
-                    otherUser
-                      ? otherUser.profilePicture
+                    otherProfile
+                      ? otherUser
                         ? otherUser.profilePicture
+                          ? otherUser.profilePicture
+                          : "../profilePicture.png"
                         : "../profilePicture.png"
                       : user
                         ? user.profilePicture
@@ -185,30 +211,41 @@ function ProfilePanel({ username }: Props) {
 
               <div className="flex flex-col gap-4 w-full lg:w-fit">
                 <h2 className="font-black text-4xl lg:text-2xl xl:text-6xl text-center text-white tracking-tighter lg:self-start self-center">
-                  {otherUser
-                    ? otherUser.fullname.toUpperCase()
+                  {otherProfile
+                    ? otherUser
+                      ? otherUser.fullname.toUpperCase()
+                      : "Loading..."
                     : user
                       ? user.fullname.toUpperCase()
                       : "No name"}
                 </h2>
                 <span className="rounded-2xl bg-[#262626] px-3 text-xs py-1 w-fit text-[#F3FFCA] lg:self-start self-center">
-                  {otherUser
-                    ? otherUser.username
+                  {otherProfile
+                    ? otherUser
+                      ? otherUser.username
+                      : "Loading..."
                     : user
                       ? user.username
                       : "No user"}
                 </span>
                 <textarea
-                  className="text-[#ADAAAA] w-1/2 resize-none overflow-hidden lg:self-start self-center"
-                  value={otherUser ? otherUser.bio : bio}
+                  ref={textareaRef}
+                  className="text-[#ADAAAA] w-full resize-none overflow-hidden lg:self-start self-center"
+                  value={
+                    otherProfile
+                      ? otherUser
+                        ? otherUser.bio
+                          ? otherUser.bio
+                          : "Hybrid Athlete. Pushing the boundaries of human performance through data-driven strength and endurance protocols."
+                        : "Loading..."
+                      : bio
+                  }
                   id="bio"
                   name="bio"
                   maxLength={150}
                   onChange={(e) => {
                     setBio(e.currentTarget.value);
-                    // auto-resize
-                    e.currentTarget.style.height = "auto";
-                    e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                    resizeTextarea();
                   }}
                   onBlur={() => {
                     if (user) {
@@ -234,23 +271,33 @@ function ProfilePanel({ username }: Props) {
                 MEMEBER SINCE
               </h3>
               <h2 className="text-[#F3FFCA] text-3xl font-extrabold w-fit text-nowrap">
-                {monthNames[
-                  new Date(
-                    otherUser
-                      ? otherUser.membersince
-                      : user
-                        ? user.createdAt
-                        : "None",
-                  ).getMonth()
-                ].toUpperCase() +
-                  " " +
-                  new Date(
-                    otherUser
-                      ? otherUser.membersince
-                      : user
-                        ? user.createdAt
-                        : "None",
-                  ).getFullYear()}
+                {otherProfile
+                  ? otherUser
+                    ? monthNames[
+                        new Date(otherUser.membersince).getMonth()
+                      ].toUpperCase() +
+                      " " +
+                      new Date(
+                        otherUser
+                          ? otherUser.membersince
+                          : user
+                            ? user.createdAt
+                            : "None",
+                      ).getFullYear()
+                    : "Loading..."
+                  : user
+                    ? monthNames[
+                        new Date(user.createdAt).getMonth()
+                      ].toUpperCase() +
+                      " " +
+                      new Date(
+                        otherUser
+                          ? otherUser.membersince
+                          : user
+                            ? user.createdAt
+                            : "None",
+                      ).getFullYear()
+                    : "Loading..."}
               </h2>
             </div>
           </section>

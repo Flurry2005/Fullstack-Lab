@@ -1,6 +1,5 @@
-import React from "react";
 import NavBar from "../NavBar";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import GlowingButton from "../Components/General/GlowingButton";
 
 function HomePanel() {

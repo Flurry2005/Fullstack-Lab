@@ -20,8 +20,8 @@ export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 function WorkoutsPanel() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.UPCOMMING);
 
-  const { exercices, setExercices } = useExercices();
-  const { sessions, setSessions } = useSessions();
+  const { exercices } = useExercices();
+  const { sessions } = useSessions();
   const { workouts, setWorkouts } = useWorkouts();
 
   const { futureSessions, pastSessions } = useMemo(() => {
@@ -115,7 +115,7 @@ function WorkoutsPanel() {
                   <h2 className="text-[#ADAAAA] text-xs">THIS MONTH</h2>
                   <p className="text-[#F3FFCA] font-black text-xl">
                     {sessions === undefined
-                      ? "Loading..."
+                      ? "..."
                       : sessions.filter(
                           (s) =>
                             new Date(s.date).getMonth() ===
@@ -130,7 +130,7 @@ function WorkoutsPanel() {
                   <h2 className="text-[#ADAAAA] text-xs">STREAK</h2>
                   <p className="text-[#FF7441] font-black text-xl">
                     {sessions === undefined
-                      ? "Loading..."
+                      ? "..."
                       : (() => {
                           const completedDays = new Set(
                             [...sessions, ...pastSessions!]
@@ -219,9 +219,11 @@ function WorkoutsPanel() {
         </section>
         {sessions === undefined ||
         workouts === undefined ||
-        exercices === undefined
-          ? "Loading..."
-          : activePanelElement}
+        exercices === undefined ? (
+          <p className="text-white text-4xl font-black">Loading sessions...</p>
+        ) : (
+          activePanelElement
+        )}
       </main>
     </div>
   );
