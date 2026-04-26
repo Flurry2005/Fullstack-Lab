@@ -3,10 +3,10 @@ import type { Workout } from "../../../../types/Workout";
 import GlowingButton from "../../../../Components/General/GlowingButton";
 import InputField from "../../../../Components/General/InputField";
 import { addSession } from "../Scripts/AddSession";
+import { useSessions } from "../../../../Context/useSessions";
 
 interface Props {
   closeSelector: () => void;
-  updateSessions: () => void;
   workouts: Workout[];
 }
 
@@ -16,7 +16,7 @@ type DateType = {
   year: string;
 };
 
-function WorkoutSelector({ closeSelector, updateSessions, workouts }: Props) {
+function WorkoutSelector({ closeSelector, workouts }: Props) {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
       <div className="bg-[#131313] p-6 h-9/10 w-9/10 md:w-6/10 md:h-8/10 rounded-xl relative overflow-scroll overflow-x-hidden">
@@ -37,7 +37,6 @@ function WorkoutSelector({ closeSelector, updateSessions, workouts }: Props) {
               key={workout._id ?? workout.workoutName}
               workout={workout}
               closeSelector={closeSelector}
-              updateSessions={updateSessions}
             />
           ))}
         </section>
@@ -51,17 +50,17 @@ export default WorkoutSelector;
 function WorkoutCard({
   workout,
   closeSelector,
-  updateSessions,
 }: {
   workout: Workout;
   closeSelector: () => void;
-  updateSessions: () => void;
 }) {
   const [date, setDate] = useState<DateType>({
     dd: "",
     mm: "",
     year: "",
   });
+
+  const { updateSessions } = useSessions();
 
   return (
     <article className="w-full h-fit bg-[#1A1A1A] rounded-2xl p-5">

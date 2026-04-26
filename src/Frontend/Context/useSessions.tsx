@@ -13,6 +13,7 @@ import { useAuth } from "./useAuth";
 type SessionContextType = {
   sessions: Session[] | undefined;
   setSessions: Dispatch<SetStateAction<Session[] | undefined>>;
+  updateSessions: () => void;
 };
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -35,8 +36,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
+  const updateSessions = async () => {
+    if (!user) return;
+    const res = await getSessions();
+
+    if (!res.success) {
+      logout;
+      return;
+    }
+
+    setSessions(res.data);
+  };
+
   return (
-    <SessionContext.Provider value={{ sessions, setSessions }}>
+    <SessionContext.Provider value={{ sessions, setSessions, updateSessions }}>
       {children}
     </SessionContext.Provider>
   );

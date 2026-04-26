@@ -9,17 +9,11 @@ import { useAuth } from "../../../../Context/useAuth.tsx";
 
 interface Props {
   sessions: Session[];
-  updateSessions: () => void;
   workouts: Workout[];
   updateWorkouts: Dispatch<SetStateAction<Workout[] | undefined>>;
 }
 
-function UpcommingSessions({
-  sessions,
-  updateSessions,
-  workouts,
-  updateWorkouts,
-}: Props) {
+function UpcommingSessions({ sessions, workouts, updateWorkouts }: Props) {
   const [workoutSelectorOpen, setWorkoutSelectorOpen] = useState(false);
   const { logout } = useAuth();
 
@@ -150,7 +144,6 @@ function UpcommingSessions({
       </section>
       {workoutSelectorOpen && (
         <WorkoutSelector
-          updateSessions={updateSessions}
           closeSelector={openWorkoutSelector}
           workouts={workouts}
         />

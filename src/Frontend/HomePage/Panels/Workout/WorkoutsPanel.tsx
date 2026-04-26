@@ -1,18 +1,13 @@
 import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
-import { useEffect, useMemo, useState, type JSX } from "react";
+import { useMemo, useState, type JSX } from "react";
 import UpcommingSessions from "./Components/UpcommingSessions";
 import CreateWorkout from "./Components/Create/CreateWorkout";
 import PastSessions from "./Components/PastSessions";
-import { getExercices } from "./Scripts/GetExercices";
-import type { Exercice } from "../../../types/Exercice";
 import type { Session } from "../../../types/Session";
-import { getSessions } from "./Scripts/GetSessions";
-import { getWorkouts } from "./Scripts/GetWorkouts";
-import type { Workout } from "../../../types/Workout";
 import { useSessions } from "../../../Context/useSessions";
-import { useAuth } from "../../../Context/useAuth";
 import { useWorkouts } from "../../../Context/useWorkouts";
+import { useExercices } from "../../../Context/useExercices";
 
 export const Panel = {
   PAST: "PAST",
@@ -25,10 +20,9 @@ export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 function WorkoutsPanel() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.UPCOMMING);
 
-  const [exercices, setExercices] = useState<Exercice[] | undefined>(undefined);
+  const { exercices, setExercices } = useExercices();
   const { sessions, setSessions } = useSessions();
-
-  const { logout } = useAuth();
+  const { workouts, setWorkouts } = useWorkouts();
 
   const { futureSessions, pastSessions } = useMemo(() => {
     const future: Session[] = [];
@@ -60,22 +54,6 @@ function WorkoutsPanel() {
     };
   }, [sessions]);
 
-  const { workouts, setWorkouts } = useWorkouts();
-
-  useEffect(() => {
-    (async () => {
-      const res = await getExercices();
-      setExercices(res.data);
-    })();
-  }, []);
-
-  const fetchSessions = async () => {
-    const res = await getSessions();
-
-    if (!res.success) return;
-
-    setSessions(res.data);
-  };
   let activePanelElement: JSX.Element;
 
   switch (activePanel) {
@@ -83,7 +61,6 @@ function WorkoutsPanel() {
       activePanelElement = (
         <UpcommingSessions
           sessions={futureSessions!}
-          updateSessions={fetchSessions}
           workouts={workouts!}
           updateWorkouts={setWorkouts}
         />
@@ -98,7 +75,6 @@ function WorkoutsPanel() {
       activePanelElement = (
         <PastSessions
           sessions={pastSessions!}
-          updateSessions={fetchSessions}
           workouts={workouts!}
           updateWorkouts={setWorkouts}
         />
@@ -109,7 +85,6 @@ function WorkoutsPanel() {
       activePanelElement = (
         <UpcommingSessions
           sessions={futureSessions!}
-          updateSessions={fetchSessions}
           workouts={workouts!}
           updateWorkouts={setWorkouts}
         />

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import HomePanel from "./HomePanel";
 import { WorkoutProvider } from "../Context/useWorkouts";
 import { useParams } from "react-router-dom";
+import { ExerciceProvider } from "../Context/useExercices";
 
 export const Panel = {
   HOME: "HOME",
@@ -58,11 +59,14 @@ function Home({ panel }: Props) {
       }
       case Panel.WORKOUTS: {
         setActivePanelElement(
-          <WorkoutProvider>
-            <SessionProvider>
-              <WorkoutsPanel />
-            </SessionProvider>
-          </WorkoutProvider>,
+          <ExerciceProvider>
+            <WorkoutProvider>
+              <SessionProvider>
+                <WorkoutsPanel />
+              </SessionProvider>
+            </WorkoutProvider>
+            ,
+          </ExerciceProvider>,
         );
         break;
       }
