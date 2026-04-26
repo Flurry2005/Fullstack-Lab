@@ -7,10 +7,24 @@ export const router = express.Router();
 router.post(
   "/create-workout",
   jwtMiddleware.jwtTokenIsValid,
-  (req, res, next) => {
-    workoutController.createWorkout(req, res);
+  async (req, res, next) => {
+    try {
+      await workoutController.createWorkout(req, res);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, error: "Interal Server Error" });
+    }
   },
 );
-router.get("/get-workouts", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
-  workoutController.getWorkouts(req, res);
-});
+router.get(
+  "/get-workouts",
+  jwtMiddleware.jwtTokenIsValid,
+  async (req, res, next) => {
+    try {
+      await workoutController.getWorkouts(req, res);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, error: "Interal Server Error" });
+    }
+  },
+);

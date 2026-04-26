@@ -4,16 +4,40 @@ import { jwtMiddleware } from "../middleware/jwtMiddleware.ts";
 
 export const router = express.Router();
 
-router.post("/login", (req, res, next) => {
-  userController.login(req, res);
+router.post("/login", async (req, res, next) => {
+  try {
+    await userController.login(req, res);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: "Interal Server Error" });
+  }
 });
-router.post("/register", (req, res, next) => {
-  userController.register(req, res);
+router.post("/register", async (req, res, next) => {
+  try {
+    await userController.register(req, res);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: "Interal Server Error" });
+  }
 });
-router.post("/update-user", jwtMiddleware.jwtTokenIsValid, (req, res, next) => {
-  userController.updateUser(req, res);
-});
+router.post(
+  "/update-user",
+  jwtMiddleware.jwtTokenIsValid,
+  async (req, res, next) => {
+    try {
+      await userController.updateUser(req, res);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, error: "Interal Server Error" });
+    }
+  },
+);
 
-router.get("/profile/:username", (req, res, next) => {
-  userController.getProfile(req, res);
+router.get("/profile/:username", async (req, res, next) => {
+  try {
+    await userController.getProfile(req, res);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: "Interal Server Error" });
+  }
 });

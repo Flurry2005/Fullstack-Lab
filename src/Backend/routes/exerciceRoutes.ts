@@ -7,7 +7,12 @@ export const router = express.Router();
 router.get(
   "/get-exercices",
   jwtMiddleware.jwtTokenIsValid,
-  (req, res, next) => {
-    exerciceController.getExercices(req, res);
+  async (req, res, next) => {
+    try {
+      await exerciceController.getExercices(req, res);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: false, error: "Interal Server Error" });
+    }
   },
 );
