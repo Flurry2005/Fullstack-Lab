@@ -1,12 +1,12 @@
 import { useEffect, useState, type JSX } from "react";
 import { useAuth } from "../Context/useAuth";
-import ProfilePanel from "./Panels/ProfilePanel";
-import DashboardPanel from "./Panels/DashboardPanel";
+import ProfilePanel from "./Panels/Profile/ProfilePanel";
+import DashboardPanel from "./Panels/Dashboard/DashboardPanel";
 import GlowingButton from "../Components/General/GlowingButton";
 import WorkoutsPanel from "./Panels/Workout/WorkoutsPanel";
 import { SessionProvider } from "../Context/useSessions";
 import { Link } from "react-router-dom";
-import HomePanel from "./HomePanel";
+import Home from "./Panels/Home/Home";
 import { WorkoutProvider } from "../Context/useWorkouts";
 import { useParams } from "react-router-dom";
 import { ExerciceProvider } from "../Context/useExercices";
@@ -24,19 +24,19 @@ interface Props {
   panel: (typeof Panel)[keyof typeof Panel];
 }
 
-function Home({ panel }: Props) {
+function MainPanel({ panel }: Props) {
   const { user } = useAuth();
   const [activePanel, setActivePanel] = useState<ActivePanel>(panel);
   const { username } = useParams();
 
   const [activePanelElement, setActivePanelElement] = useState<JSX.Element>(
-    <HomePanel />,
+    <Home />,
   );
 
   useEffect(() => {
     switch (activePanel) {
       case Panel.HOME: {
-        setActivePanelElement(<HomePanel />);
+        setActivePanelElement(<Home />);
         break;
       }
       case Panel.PROFILE: {
@@ -71,7 +71,7 @@ function Home({ panel }: Props) {
         break;
       }
       default: {
-        setActivePanelElement(<HomePanel />);
+        setActivePanelElement(<Home />);
       }
     }
   }, [activePanel]);
@@ -201,11 +201,11 @@ function Home({ panel }: Props) {
         <section className="bg-[#0E0E0E] w-full min-h-full ">
           {!user && username && activePanel === Panel.PROFILE
             ? activePanelElement
-            : (user && activePanelElement) || <HomePanel />}
+            : (user && activePanelElement) || <Home />}
         </section>
       </main>
     </>
   );
 }
 
-export default Home;
+export default MainPanel;

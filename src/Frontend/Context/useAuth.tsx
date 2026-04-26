@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { AuthContextType, User } from "../types/User";
-import { updateUser } from "../HomePage/Panels/Workout/Scripts/UpdateUser";
+import { updateUser } from "../HomePage/Panels/Profile/Scripts/UpdateUser";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

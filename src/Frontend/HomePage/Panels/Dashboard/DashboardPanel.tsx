@@ -1,8 +1,8 @@
-import NavBar from "../../NavBar";
-import { formatWeight } from "../../utils/FormatWeight";
-import { useSessions } from "../../Context/useSessions";
-import type { Session } from "../../types/Session";
-import { useWorkouts } from "../../Context/useWorkouts";
+import NavBar from "../../../NavBar";
+import { formatWeight } from "../../../utils/FormatWeight";
+import { useSessions } from "../../../Context/useSessions";
+import type { Session } from "../../../types/Session";
+import { useWorkouts } from "../../../Context/useWorkouts";
 
 function DashboardPanel() {
   const { sessions } = useSessions();

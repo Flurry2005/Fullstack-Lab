@@ -2,8 +2,8 @@ import { useState } from "react";
 import InputField from "../Components/General/InputField";
 import GlowingButton from "../Components/General/GlowingButton";
 import { useNavigate } from "react-router-dom";
-import { Login } from "./Login";
-import { Register } from "./Register";
+import { Login } from "./Scripts/Login";
+import { Register } from "./Scripts/Register";
 import { useAuth } from "../Context/useAuth";
 
 function LoginPage() {

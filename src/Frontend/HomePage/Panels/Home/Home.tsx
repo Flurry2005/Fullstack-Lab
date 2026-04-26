@@ -1,8 +1,8 @@
-import NavBar from "../NavBar";
+import NavBar from "../../../NavBar";
 import { useNavigate } from "react-router-dom";
-import GlowingButton from "../Components/General/GlowingButton";
+import GlowingButton from "../../../Components/General/GlowingButton";
 
-function HomePanel() {
+function Home() {
   const navigate = useNavigate();
   return (
     <div className="relative h-screen overflow-y-hidden w-full">
@@ -39,4 +39,4 @@ function HomePanel() {
   );
 }
 
-export default HomePanel;
+export default Home;

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useAuth } from "../../Context/useAuth";
-import NavBar from "../../NavBar";
-import { useSessions } from "../../Context/useSessions";
-import type { Session } from "../../types/Session.ts";
-import { formatWeight } from "../../utils/FormatWeight.ts";
-import { updateUser } from "./Workout/Scripts/UpdateUser.ts";
+import { useAuth } from "../../../Context/useAuth.tsx";
+import NavBar from "../../../NavBar.tsx";
+import { useSessions } from "../../../Context/useSessions.tsx";
+import type { Session } from "../../../types/Session.ts";
+import { formatWeight } from "../../../utils/FormatWeight.ts";
+import { updateUser } from "./Scripts/UpdateUser.ts";
 import { useParams } from "react-router-dom";
 
 type OtherProfile = {

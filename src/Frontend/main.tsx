@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import Home, { Panel } from "./HomePage/Home.tsx";
+import MainPanel, { Panel } from "./HomePage/MainPanel.tsx";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./Context/useAuth.tsx";
 import LoginPage from "./LoginPage/LoginPage.tsx";
@@ -11,19 +11,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home panel={Panel.HOME} />,
+        element: <MainPanel panel={Panel.HOME} />,
       },
       {
         path: "/dashboard",
-        element: <Home panel={Panel.DASHBOARD} />,
+        element: <MainPanel panel={Panel.DASHBOARD} />,
       },
       {
         path: "/workouts",
-        element: <Home panel={Panel.WORKOUTS} />,
+        element: <MainPanel panel={Panel.WORKOUTS} />,
       },
       {
         path: "/profile/:username",
-        element: <Home panel={Panel.PROFILE} />,
+        element: <MainPanel panel={Panel.PROFILE} />,
       },
       {
         path: "/login",
