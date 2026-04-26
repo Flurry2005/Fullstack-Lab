@@ -11,15 +11,15 @@ function LoginPage() {
   const navigate = useNavigate();
   const [loginMode, setLoginMode] = useState(true);
   return (
-    <div className="min-h-screen bg-[#0f172a] relative overflow-hidden w-screen h-screen">
+    <div className=" bg-[#0f172a] relative overflow-hidden w-screen">
       <div className="absolute inset-0 bg-linear-to-r from-[#0f172a] via-[#1f3a3a] to-[#6b8f8d]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_50%,rgba(255,255,255,0.15),transparent_40%)]"></div>
-      <div className="relative z-10 w-full h-full flex justify-center items-center">
-        <div className="absolute w-9/10  h-7/10 rounded-2xl blur-2xl z-0"></div>
-        <main className="w-9/10 max-w-250  h-7/10 rounded-r-2xl shadow-amber-50/10 shadow-[0px_0px_26px_7px_rgba(0,0,0,0.1)] flex overflow-hidden z-1">
-          <section className="w-6/10 h-full text-white px-10 py-10 gap-5 flex flex-col">
+      <div className="relative z-10 w-full py-5 min-h-screen flex justify-center items-center">
+        <div className="absolute w-9/10  xl:h-7/10 h-140 rounded-2xl blur-2xl z-0"></div>
+        <main className="w-9/10 max-w-250 h-9/10 xl:h-140 rounded-r-2xl shadow-amber-50/10 xl:flex-row flex-col items-center shadow-[0px_0px_26px_7px_rgba(0,0,0,0.1)] flex overflow-hidden z-1">
+          <section className="xl:w-6/10 h-fit text-white px-10 py-10 gap-5 flex flex-col">
             <h1 className="text-[#F3FFCA] text-4xl font-extrabold">KINETIC</h1>
-            <h2 className="text-8xl font-extrabold">
+            <h2 className="xl:text-8xl text-4xl font-extrabold">
               PUSH BEYOND <span className="text-[#F3FFCA]">LIMITS</span>
             </h2>
             <p className="text-[#ADAAAA] text-sm">
@@ -42,7 +42,7 @@ function LoginPage() {
             </div>
           </section>
           {/* Content */}
-          <section className="w-4/10 h-full bg-[#262626]/60 flex flex-col px-10 gap-5 pb-10 justify-center">
+          <section className="xl:w-4/10 w-full h-full bg-[#262626]/60 flex flex-col px-10 gap-5 justify-center py-5">
             <h2 className="font-lexend text-white font-extrabold text-3xl">
               {loginMode ? "Welcome Back" : "Join Us!"}
             </h2>
@@ -136,9 +136,6 @@ function LoginPage() {
                   <label htmlFor="password" className="text-[#ADAAAA] text-xs">
                     PASSWORD
                   </label>
-                  <Link to={"/"} className="text-white cursor-pointer text-xs">
-                    Forgot Password?
-                  </Link>
                 </div>
                 <InputField
                   placeholder="••••••••"
