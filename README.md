@@ -12,6 +12,14 @@ project-root/src/
 
 ---
 
+## Installation
+Clone the repository
+```bash
+git clone https://github.com/Flurry2005/Fullstack-Lab.git
+```
+
+---
+
 ## Project Setup
 
 ### 1. Go to root folder
