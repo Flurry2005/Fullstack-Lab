@@ -9,7 +9,7 @@ router.post("/login", async (req, res, next) => {
     await userController.login(req, res);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, error: "Interal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 router.post("/register", async (req, res, next) => {
@@ -17,7 +17,7 @@ router.post("/register", async (req, res, next) => {
     await userController.register(req, res);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, error: "Interal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });
 router.post(
@@ -28,7 +28,7 @@ router.post(
       await userController.updateUser(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
@@ -38,6 +38,6 @@ router.get("/profile/:username", async (req, res, next) => {
     await userController.getProfile(req, res);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, error: "Interal Server Error" });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 });

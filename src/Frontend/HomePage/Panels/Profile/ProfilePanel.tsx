@@ -155,10 +155,10 @@ function ProfilePanel() {
       </>
     );
 
-  if (!otherUser && !user) {
+  if (!otherUser && otherProfile) {
     return (
       <p className="text-white w-full h-full text-center flex items-center justify-center">
-        ...
+        No user with that username was found...
       </p>
     );
   }

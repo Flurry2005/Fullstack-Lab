@@ -12,7 +12,7 @@ router.post(
       await workoutController.createWorkout(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
@@ -24,7 +24,7 @@ router.get(
       await workoutController.getWorkouts(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );

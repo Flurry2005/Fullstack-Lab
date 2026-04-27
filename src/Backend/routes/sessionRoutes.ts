@@ -12,7 +12,7 @@ router.get(
       await sessionController.getSessions(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
@@ -25,7 +25,7 @@ router.post(
       await sessionController.addSession(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
@@ -37,7 +37,7 @@ router.patch(
       await sessionController.updateSession(req, res);
     } catch (error) {
       console.log(error);
-      res.status(500).json({ success: false, error: "Interal Server Error" });
+      res.status(500).json({ success: false, error: "Internal Server Error" });
     }
   },
 );
