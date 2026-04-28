@@ -261,7 +261,7 @@ function ProfilePanel() {
                       e.currentTarget.blur(); // removes focus
                     }
                   }}
-                  readOnly={!otherProfile}
+                  readOnly={otherProfile}
                   disabled={otherProfile}
                 />
               </div>
