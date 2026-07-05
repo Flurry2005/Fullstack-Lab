@@ -61,18 +61,23 @@ export async function Register(
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/register`
+        : "https://api.kineticedge.liamjorgensen.dev/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullname: fullname,
+          username: username,
+          email: email,
+          password: password,
+        }),
       },
-      body: JSON.stringify({
-        fullname: fullname,
-        username: username,
-        email: email,
-        password: password,
-      }),
-    });
+    );
 
     const res = await response.json();
 

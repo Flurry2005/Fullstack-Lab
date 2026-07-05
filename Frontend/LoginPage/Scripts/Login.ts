@@ -32,7 +32,7 @@
 export async function Login(email: string, password: string) {
   const emailRegex =
     /^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:(?:\\[\x00-\x7F]|[^\\"]))*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\[(?:\d{1,3}\.){3}\d{1,3}\]))$/;
-console.log(email, password)
+  console.log(email, password);
   if (
     email.trim() === "" ||
     password.trim() === "" ||
@@ -46,7 +46,9 @@ console.log(email, password)
 
   try {
     const response = await fetch(
-      `http://localhost:3000/login`,
+      import.meta.env.DEV
+        ? `http://localhost:3000/login`
+        : "https://api.kineticedge.liamjorgensen.dev/login",
       {
         method: "POST",
         headers: {
