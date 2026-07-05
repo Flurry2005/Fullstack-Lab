@@ -3,7 +3,7 @@ export async function getSessions() {
     const response = await fetch(
       import.meta.env.DEV
         ? `http://localhost:3000/get-sessions`
-        : "https://kineticedge.liamjorgensen.dev/get-sessions",
+        : "https://api.kineticedge.liamjorgensen.dev/get-sessions",
       {
         method: "GET",
         credentials: "include",

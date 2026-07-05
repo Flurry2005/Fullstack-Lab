@@ -16,7 +16,7 @@ export async function createWorkout(
     const response = await fetch(
       import.meta.env.DEV
         ? `http://localhost:3000/create-workout`
-        : "https://kineticedge.liamjorgensen.dev/create-workout",
+        : "https://api.kineticedge.liamjorgensen.dev/create-workout",
       {
         method: "POST",
         headers: {

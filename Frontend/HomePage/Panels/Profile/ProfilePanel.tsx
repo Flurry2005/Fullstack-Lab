@@ -38,9 +38,14 @@ function ProfilePanel() {
       if (!otherProfile || !username) return;
       console.log("Username:" + username);
       try {
-        const res = await fetch("http://localhost:3000/profile/" + username, {
-          cache: "no-store",
-        });
+        const res = await fetch(
+          import.meta.env.DEV
+            ? "http://localhost:3000/profile/"
+            : "https://api.kineticedge.liamjorgensen.dev/" + username,
+          {
+            cache: "no-store",
+          },
+        );
 
         if (!res.ok) return;
 

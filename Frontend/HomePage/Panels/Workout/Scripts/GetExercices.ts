@@ -3,7 +3,7 @@ export async function getExercices() {
     const response = await fetch(
       import.meta.env.DEV
         ? `http://localhost:3000/get-exercices`
-        : "https://kineticedge.liamjorgensen.dev/get-exercices",
+        : "https://api.kineticedge.liamjorgensen.dev/get-exercices",
       {
         method: "GET",
         credentials: "include",
