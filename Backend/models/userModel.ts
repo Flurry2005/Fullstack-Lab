@@ -33,6 +33,17 @@ const userSchema = new mongoose.Schema(
     profilePicture: {
       type: String,
     },
+    withings: {
+      connected: { type: Boolean, default: false },
+
+      withingsUserId: { type: String },
+
+      accessToken: { type: String },
+
+      refreshToken: { type: String },
+
+      expiresAt: { type: Date },
+    },
   },
   { timestamps: true },
 );
