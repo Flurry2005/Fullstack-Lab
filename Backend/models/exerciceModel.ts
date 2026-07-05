@@ -12,7 +12,7 @@ export const exerciceSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
     trim: true,
     lowercase: true,
   },
