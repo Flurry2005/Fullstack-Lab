@@ -1,9 +1,14 @@
 export async function getWorkouts() {
   try {
-    const response = await fetch(`http://localhost:3000/get-workouts`, {
-      method: "GET",
-      credentials: "include",
-    });
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/get-workouts`
+        : "https://kineticedge.liamjorgensen.dev/get-workouts",
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
 
     const res = await response.json();
 

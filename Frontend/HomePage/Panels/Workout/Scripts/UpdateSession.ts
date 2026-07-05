@@ -2,14 +2,19 @@ import type { Session } from "../../../../types/Session";
 
 export async function updateSession(session: Session) {
   try {
-    const response = await fetch(`http://localhost:3000/update-session`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/update-session`
+        : "https://kineticedge.liamjorgensen.dev/update-session",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ session: session }),
+        credentials: "include",
       },
-      body: JSON.stringify({ session: session }),
-      credentials: "include",
-    });
+    );
 
     const res = await response.json();
 

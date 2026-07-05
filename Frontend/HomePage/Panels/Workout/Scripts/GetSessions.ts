@@ -1,9 +1,14 @@
 export async function getSessions() {
   try {
-    const response = await fetch(`http://localhost:3000/get-sessions`, {
-      method: "GET",
-      credentials: "include",
-    });
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/get-sessions`
+        : "https://kineticedge.liamjorgensen.dev/get-sessions",
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
 
     const res = await response.json();
 

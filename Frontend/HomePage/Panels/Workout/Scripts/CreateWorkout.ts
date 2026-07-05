@@ -13,19 +13,24 @@ export async function createWorkout(
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/create-workout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/create-workout`
+        : "https://kineticedge.liamjorgensen.dev/create-workout",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workoutName: workoutName,
+          workoutDesc: workoutDesc,
+          tags,
+          exercices,
+        }),
+        credentials: "include",
       },
-      body: JSON.stringify({
-        workoutName: workoutName,
-        workoutDesc: workoutDesc,
-        tags,
-        exercices,
-      }),
-      credentials: "include",
-    });
+    );
 
     const res = await response.json();
 

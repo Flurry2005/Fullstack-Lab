@@ -6,14 +6,19 @@ export async function addSession(workoutId: string, date: Date) {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/add-session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/add-session`
+        : "https://kineticedge.liamjorgensen.dev/add-sessions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ workoutId: workoutId, date: date }),
+        credentials: "include",
       },
-      body: JSON.stringify({ workoutId: workoutId, date: date }),
-      credentials: "include",
-    });
+    );
 
     const res = await response.json();
 
