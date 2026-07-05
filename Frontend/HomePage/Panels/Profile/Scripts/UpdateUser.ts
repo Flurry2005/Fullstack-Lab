@@ -2,14 +2,19 @@ import type { User } from "../../../../types/User";
 
 export async function updateUser(user: User) {
   try {
-    const response = await fetch(`http://localhost:3000/update-user`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      import.meta.env.DEV
+        ? `http://localhost:3000/update-user`
+        : "https://api.kineticedge.liamjorgensen.dev/update-user",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...user }),
+        credentials: "include",
       },
-      body: JSON.stringify({ ...user }),
-      credentials: "include",
-    });
+    );
 
     const res = await response.json();
 
