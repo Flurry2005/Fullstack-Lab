@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import NavBar from "../../../NavBar.tsx";
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
 } from "recharts";
 
 interface Measure {
@@ -30,12 +30,21 @@ interface WeightPoint {
 interface BodyFatPoint {
   timestamp: number;
   date: string;
-  bodyFat: number;
+  percent: number | null;
+  kg: number | null;
 }
+
+type Range = "all" | "year" | "month" | "week";
+type BodyFatMode = "percent" | "kg";
 
 function MeasurementsPanel() {
   const [weightData, setWeightData] = useState<WeightPoint[]>([]);
   const [bodyFatData, setBodyFatData] = useState<BodyFatPoint[]>([]);
+
+  const [range, setRange] = useState<Range>("all");
+  const [bodyFatMode, setBodyFatMode] = useState<BodyFatMode>("percent");
+
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   const getData = async () => {
     const response = await fetch(
@@ -61,22 +70,24 @@ function MeasurementsPanel() {
           weight: measure.value * Math.pow(10, measure.unit),
         };
       })
-      .filter((item): item is WeightPoint => item !== null)
+      .filter((x): x is WeightPoint => x !== null)
       .sort((a, b) => a.timestamp - b.timestamp);
 
     const bodyFat: BodyFatPoint[] = json.body.measuregrps
       .map((group: MeasureGroup) => {
-        const measure = group.measures.find((m) => m.type === 6);
+        const percent = group.measures.find((m) => m.type === 6);
+        const kg = group.measures.find((m) => m.type === 8);
 
-        if (!measure) return null;
+        if (!percent && !kg) return null;
 
         return {
           timestamp: group.date,
           date: new Date(group.date * 1000).toLocaleDateString(),
-          bodyFat: measure.value * Math.pow(10, measure.unit),
+          percent: percent ? percent.value * Math.pow(10, percent.unit) : null,
+          kg: kg ? kg.value * Math.pow(10, kg.unit) : null,
         };
       })
-      .filter((item): item is BodyFatPoint => item !== null)
+      .filter((x): x is BodyFatPoint => x !== null)
       .sort((a, b) => a.timestamp - b.timestamp);
 
     setWeightData(weight);
@@ -87,98 +98,276 @@ function MeasurementsPanel() {
     getData();
   }, []);
 
-  const { minWeight, maxWeight } = useMemo(() => {
-    if (weightData.length === 0) {
-      return { minWeight: 0, maxWeight: 100 };
+  const filterData = <T extends { timestamp: number }>(data: T[]) => {
+    if (range === "all") return data;
+
+    const end = new Date(currentDate);
+    let start = new Date(currentDate);
+
+    switch (range) {
+      case "year":
+        start = new Date(end.getFullYear() - 1, end.getMonth(), end.getDate());
+        break;
+
+      case "month":
+        start = new Date(end.getFullYear(), end.getMonth(), 1);
+        end.setMonth(end.getMonth() + 1);
+        end.setDate(0);
+        break;
+
+      case "week":
+        start.setDate(end.getDate() - 7);
+        break;
     }
 
-    const values = weightData.map((d) => d.weight);
+    return data.filter((d) => {
+      const date = new Date(d.timestamp * 1000);
+      return date >= start && date <= end;
+    });
+  };
+
+  const filteredWeight = useMemo(
+    () => filterData(weightData),
+    [weightData, range, currentDate],
+  );
+
+  const filteredBodyFat = useMemo(
+    () => filterData(bodyFatData),
+    [bodyFatData, range, currentDate],
+  );
+
+  const weightBounds = useMemo(() => {
+    if (!filteredWeight.length) return { min: 0, max: 100 };
+
+    const values = filteredWeight.map((x) => x.weight);
 
     return {
-      minWeight: Math.floor(Math.min(...values)) - 1,
-      maxWeight: Math.ceil(Math.max(...values)) + 1,
+      min: Math.floor(Math.min(...values)) - 1,
+      max: Math.ceil(Math.max(...values)) + 1,
     };
-  }, [weightData]);
+  }, [filteredWeight]);
 
-  const { minBodyFat, maxBodyFat } = useMemo(() => {
-    if (bodyFatData.length === 0) {
-      return { minBodyFat: 0, maxBodyFat: 50 };
-    }
+  const bodyFatBounds = useMemo(() => {
+    const values = filteredBodyFat
+      .map((x) => (bodyFatMode === "percent" ? x.percent : x.kg))
+      .filter((v): v is number => v !== null);
 
-    const values = bodyFatData.map((d) => d.bodyFat);
+    if (!values.length) return { min: 0, max: 50 };
 
     return {
-      minBodyFat: Math.floor(Math.min(...values)) - 1,
-      maxBodyFat: Math.ceil(Math.max(...values)) + 1,
+      min: Math.floor(Math.min(...values)) - 1,
+      max: Math.ceil(Math.max(...values)) + 1,
     };
-  }, [bodyFatData]);
+  }, [filteredBodyFat, bodyFatMode]);
+  const bodyFatChartData = filteredBodyFat
+    .map((point) => ({
+      timestamp: point.timestamp,
+      date: point.date,
+      value: bodyFatMode === "percent" ? point.percent : point.kg,
+    }))
+    .filter(
+      (
+        point,
+      ): point is {
+        timestamp: number;
+        date: string;
+        value: number;
+      } => point.value !== null,
+    );
+
+  const movePrevious = () => {
+    setCurrentDate((prev) => {
+      const next = new Date(prev);
+
+      switch (range) {
+        case "year":
+          next.setFullYear(next.getFullYear() - 1);
+          break;
+
+        case "month":
+          next.setMonth(next.getMonth() - 1);
+          break;
+
+        case "week":
+          next.setDate(next.getDate() - 7);
+          break;
+      }
+
+      return next;
+    });
+  };
+  const moveNext = () => {
+    setCurrentDate((prev) => {
+      const next = new Date(prev);
+
+      switch (range) {
+        case "year":
+          next.setFullYear(next.getFullYear() + 1);
+          break;
+
+        case "month":
+          next.setMonth(next.getMonth() + 1);
+          break;
+
+        case "week":
+          next.setDate(next.getDate() + 7);
+          break;
+      }
+
+      return next;
+    });
+  };
 
   return (
     <div>
       <NavBar />
 
       <main className="flex flex-col px-10 gap-10 h-full pt-10 w-full">
-        <section className="flex justify-between lg:px-10">
-          <h2 className="text-3xl text-white font-black">Weight Progress</h2>
+        <section className="flex flex-wrap justify-between items-center gap-4">
+          <h2 className="text-3xl font-black text-white">Measurements</h2>
+
+          <div className="flex gap-2">
+            {(["all", "year", "month", "week"] as Range[]).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-4 py-2 rounded-lg transition ${
+                  range === r
+                    ? "bg-blue-600 text-white"
+                    : "bg-zinc-800 text-zinc-300"
+                }`}
+              >
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </button>
+            ))}
+          </div>
         </section>
 
-        <div className="bg-zinc-900 rounded-xl p-6 h-[450px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={weightData}>
-              <CartesianGrid strokeDasharray="3 3" />
+        {range !== "all" && (
+          <div className="flex justify-center items-center gap-6">
+            <button
+              onClick={movePrevious}
+              className="bg-zinc-800 hover:bg-zinc-700 rounded-lg px-4 py-2 text-white"
+            >
+              ←
+            </button>
 
-              <XAxis dataKey="date" />
+            <span className="text-white text-lg font-semibold">
+              {range === "year"
+                ? currentDate.getFullYear()
+                : range === "month"
+                  ? currentDate.toLocaleDateString(undefined, {
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : currentDate.toLocaleDateString()}
+            </span>
 
-              <YAxis domain={[minWeight, maxWeight]} unit=" kg" />
+            <button
+              onClick={moveNext}
+              className="bg-zinc-800 hover:bg-zinc-700 rounded-lg px-4 py-2 text-white"
+            >
+              →
+            </button>
+          </div>
+        )}
 
-              <Tooltip
-                formatter={(value: number) => [
-                  `${value.toFixed(1)} kg`,
-                  "Weight",
-                ]}
-              />
+        <section>
+          <h2 className="text-3xl text-white font-black mb-4">
+            Weight Progress
+          </h2>
 
-              <Line
-                dataKey="weight"
-                type="natural"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+          <div className="bg-zinc-900 rounded-xl p-6 h-[450px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={filteredWeight}>
+                <CartesianGrid strokeDasharray="3 3" />
 
-        <section className="flex justify-between lg:px-10">
-          <h2 className="text-3xl text-white font-black">Body Fat %</h2>
+                <XAxis dataKey="date" />
+
+                <YAxis
+                  domain={[weightBounds.min, weightBounds.max]}
+                  unit=" kg"
+                />
+
+                <Tooltip
+                  formatter={(value: number) => [
+                    `${value.toFixed(1)} kg`,
+                    "Weight",
+                  ]}
+                />
+
+                <Line
+                  dataKey="weight"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  type="natural"
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </section>
+        <section>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-3xl text-white font-black">Body Fat</h2>
 
-        <div className="bg-zinc-900 rounded-xl p-6 h-[450px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={bodyFatData}>
-              <CartesianGrid strokeDasharray="3 3" />
+            <div className="flex rounded-lg overflow-hidden border border-zinc-700">
+              <button
+                onClick={() => setBodyFatMode("percent")}
+                className={`px-4 py-2 ${
+                  bodyFatMode === "percent"
+                    ? "bg-green-600 text-white"
+                    : "bg-zinc-800 text-zinc-300"
+                }`}
+              >
+                %
+              </button>
 
-              <XAxis dataKey="date" />
+              <button
+                onClick={() => setBodyFatMode("kg")}
+                className={`px-4 py-2 ${
+                  bodyFatMode === "kg"
+                    ? "bg-green-600 text-white"
+                    : "bg-zinc-800 text-zinc-300"
+                }`}
+              >
+                kg
+              </button>
+            </div>
+          </div>
 
-              <YAxis domain={[minBodyFat, maxBodyFat]} unit="%" />
+          <div className="bg-zinc-900 rounded-xl p-6 h-[450px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={bodyFatChartData} className="focus:border-0">
+                <CartesianGrid strokeDasharray="3 3" />
 
-              <Tooltip
-                formatter={(value: number) => [
-                  `${value.toFixed(1)}%`,
-                  "Body Fat",
-                ]}
-              />
+                <XAxis dataKey="date" />
 
-              <Line
-                dataKey="bodyFat"
-                type="natural"
-                stroke="#22c55e"
-                strokeWidth={3}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+                <YAxis
+                  domain={[bodyFatBounds.min, bodyFatBounds.max]}
+                  unit={bodyFatMode === "percent" ? "%" : " kg"}
+                />
+
+                <Tooltip
+                  formatter={(value: number) => [
+                    bodyFatMode === "percent"
+                      ? `${value.toFixed(1)}%`
+                      : `${value.toFixed(2)} kg`,
+                    bodyFatMode === "percent" ? "Body Fat %" : "Fat Mass",
+                  ]}
+                />
+
+                <Line
+                  dataKey="value"
+                  stroke="#22c55e"
+                  strokeWidth={3}
+                  type="natural"
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
       </main>
     </div>
   );

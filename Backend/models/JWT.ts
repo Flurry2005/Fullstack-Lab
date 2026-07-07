@@ -5,7 +5,7 @@ interface JWTPayload {
   userId: ObjectId;
   username: string;
   email: string;
-  withings: [withingsConnected: Boolean];
+  withings: { withingsConnected: Boolean; expiresAt: Date | null };
 }
 
 const JWTModel = {
@@ -14,12 +14,13 @@ const JWTModel = {
     username: string,
     email: string,
     withingsConnected: boolean,
+    expiresAt: Date | null,
   ): string {
     const payload: JWTPayload = {
       userId,
       username,
       email,
-      withings: [withingsConnected],
+      withings: { withingsConnected, expiresAt },
     };
 
     const options: any = {

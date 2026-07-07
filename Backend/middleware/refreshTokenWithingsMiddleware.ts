@@ -9,7 +9,12 @@ middleware.checkToken = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (Date.now() >= res.locals.jwt.withings.expiresAt) {
+  const user = await userModel.findById({ _id: res.locals.jwt.userId });
+
+  if (!user?.withings?.connected || !user) return res.status(500).send();
+
+  if (Date.now() >= user.withings.expiresAt!.getTime()) {
+    console.warn("Key Expired, refreshing...");
     const user = await userModel.findById({ _id: res.locals.jwt.userId });
 
     const clientId = process.env.WITHINGS_CLIENT_ID;
@@ -61,6 +66,7 @@ middleware.checkToken = async (
       return res.status(500).send();
     }
   } else {
+    console.log("Key Valid, continue...");
     next();
   }
 };

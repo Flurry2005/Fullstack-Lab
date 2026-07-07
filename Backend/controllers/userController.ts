@@ -22,7 +22,6 @@ class UserController {
       delete userObj.passwordHash;
       delete userObj.withings?.accessToken;
       delete userObj.withings?.refreshToken;
-      delete userObj.withings?.expiresAt;
       delete userObj.withings?.withingsUserId;
 
       const token = JWTModel.createJwtToken(
@@ -30,6 +29,7 @@ class UserController {
         user.username,
         email,
         user.withings ? user.withings.connected : false,
+        user.withings ? new Date(user.withings.expiresAt!) : null,
       );
       const expiry = new Date(Date.now() + 1000 * 60 * 60);
       res.cookie("token", token, {
