@@ -48,7 +48,7 @@ class UserController {
   }
   async register(req: Request<{}, {}, RegisterBody>, res: Response) {
     const { fullname, username, email, password } = req.body;
-    if (await Users.findOne({ username: username })) {
+    if (await Users.findOne({ username: username.toLowerCase() })) {
       return res
         .status(409)
         .json({ success: false, error: "Username already exists!" });
@@ -60,7 +60,7 @@ class UserController {
     }
     await Users.insertOne({
       fullname,
-      username,
+      username: username.toLowerCase(),
       email,
       passwordHash: await bcrypt.hash(password, 12),
     });
@@ -171,19 +171,78 @@ class UserController {
 
     longest = Math.max(longest, current);
 
+    {
+      /*Withings Data*/
+    }
+
+    const accessToken = user?.withings?.accessToken;
+
+    const endDate = new Date().toISOString().split("T")[0];
+
+    // Fetch a long history (adjust as needed)
+    const startDate = "2015-01-01";
+
+    let activities = [];
+    let offset = 0;
+    let more = true;
+
+    while (more) {
+      const body = new URLSearchParams({
+        action: "getactivity",
+        startdateymd: "2015-01-01",
+        enddateymd: new Date().toISOString().split("T")[0],
+        data_fields: "steps,distance",
+        offset: offset.toString(),
+      });
+
+      const response = await fetch("https://wbsapi.withings.net/v2/measure", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body,
+      });
+
+      const data = await response.json();
+
+      if (data.status !== 0) {
+        throw new Error(data.error || "Withings API error");
+      }
+
+      activities.push(...(data.body.activities ?? []));
+
+      more = data.body.more;
+      offset = data.body.offset;
+    }
+
+    // Total distance (meters)
+    const totalDistanceTraveled = activities.reduce(
+      (sum, activity) => sum + (activity.distance || 0),
+      0,
+    );
+
+    // Best daily step count
+    const mostStepsOneDay = activities.reduce(
+      (max, activity) => Math.max(max, activity.steps || 0),
+      0,
+    );
+
     return res.status(200).json({
       success: true,
       data: {
         fullname: user.fullname,
         username: user.username,
         bio: user.bio,
-        volume: volume,
-        workouts: sessions.filter((workout) => workout.completed === true)
-          .length,
-        streak: streak,
+        volume,
+        workouts: sessions.filter((workout) => workout.completed).length,
+        streak,
         beststreak: longest,
         profilePicture: user.profilePicture,
         membersince: user.createdAt,
+        totalDistanceTraveled,
+        mostStepsOneDay,
+        temp: activities,
       },
     });
   }

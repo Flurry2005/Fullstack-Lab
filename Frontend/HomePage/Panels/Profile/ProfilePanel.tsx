@@ -6,6 +6,7 @@ import type { Session } from "../../../types/Session.ts";
 import { formatWeight } from "../../../utils/FormatWeight.ts";
 import { updateUser } from "./Scripts/UpdateUser.ts";
 import { useParams } from "react-router-dom";
+import { Footprints } from "lucide-react";
 
 type OtherProfile = {
   fullname: string;
@@ -17,6 +18,8 @@ type OtherProfile = {
   beststreak: string;
   profilePicture: string;
   membersince: string;
+  totalDistanceTraveled: number;
+  mostStepsOneDay: number;
 };
 
 function ProfilePanel() {
@@ -35,12 +38,12 @@ function ProfilePanel() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      if (!otherProfile || !username) return;
+      if (!username) return;
       console.log("Username:" + username);
       try {
         const res = await fetch(
           import.meta.env.DEV
-            ? "http://localhost:3000/profile/"
+            ? "http://localhost:3000/profile/" + username
             : "https://api.kineticedge.liamjorgensen.dev/profile/" + username,
           {
             cache: "no-store",
@@ -380,7 +383,7 @@ function ProfilePanel() {
               <article className="bg-[#1A1A1A] w-full xl:w-60 h-40 rounded-3xl flex flex-col px-10 py-5 xl:items-start items-center justify-around overflow-hidden relative">
                 <div className="bg-[#FF7441] absolute bottom-0 left-0 h-1 w-full"></div>
                 <h2 className="text-[#ADAAAA]  font-light tracking-tighter">
-                  STREAK
+                  DISTANCE
                 </h2>
                 <div className="flex gap-2 items-center">
                   <p className="text-white font-black text-6xl">
@@ -462,6 +465,29 @@ function ProfilePanel() {
 
                           return "Personal Best: " + longest + " Days";
                         })()}
+                </p>
+              </article>
+              <article className="bg-[#1A1A1A] w-full xl:w-60 h-40 rounded-3xl flex flex-col px-5 py-5 xl:items-start items-center justify-around overflow-hidden relative">
+                <div className="bg-green-500 absolute bottom-0 left-0 h-1 w-full"></div>
+                <h2 className="text-[#ADAAAA]  font-light tracking-tighter flex gap-2">
+                  ACHEIVEMENTS
+                  <Footprints className="font-black text-green-500" />
+                </h2>
+                <div className="flex gap-2 items-center">
+                  <p className="text-white font-black text-sm"></p>
+                </div>
+                <p className="text-[#ADAAAA] text-xs">
+                  Total Distance Traveled{" "}
+                  {otherUser
+                    ? String(
+                        (otherUser!.totalDistanceTraveled! / 1000).toFixed(2),
+                      )
+                    : 0}{" "}
+                  KM
+                </p>
+                <p className="text-[#ADAAAA] text-xs">
+                  Most Steps In One Day{" "}
+                  {otherUser ? String(otherUser!.mostStepsOneDay!) : 0}
                 </p>
               </article>
             </section>
