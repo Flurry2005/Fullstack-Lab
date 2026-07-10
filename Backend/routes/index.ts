@@ -3,6 +3,7 @@ import { router as exerciceRouter } from "./exerciceRoutes.js";
 import { router as workoutRouter } from "./workoutRoutes.js";
 import { router as sessionRouter } from "./sessionRoutes.js";
 import { router as withingsRouter } from "./withingsRoutes.js";
+import { router as nutritionRouter } from "./nutritionRoutes.js";
 import express from "express";
 
 export const mainRouter = express.Router();
@@ -16,3 +17,5 @@ mainRouter.use(workoutRouter);
 mainRouter.use(sessionRouter);
 
 mainRouter.use(withingsRouter);
+
+mainRouter.use(nutritionRouter);
