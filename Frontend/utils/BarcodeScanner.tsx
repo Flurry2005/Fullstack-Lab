@@ -27,7 +27,48 @@ export default function BarcodeScanner({
   const [found, setFound] = useState(false);
   const [error, setError] = useState("");
 
+  const [manualMode, setManualMode] = useState(false);
+  const [manualBarcode, setManualBarcode] = useState("");
+
+  async function lookupBarcode(barcode: string) {
+    try {
+      const res = await fetch(
+        `https://world.openfoodfacts.org/api/v3/product/${barcode}?fields=product_name,nutriments,brands,image_front_url`,
+      );
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        onProductFound(barcode, data.product);
+        onClose();
+      } else {
+        onProductNotFound(barcode);
+        onClose();
+      }
+    } catch {
+      setError("Lookup failed");
+    }
+  }
+
+  function stopCamera() {
+    controlsRef.current?.stop();
+
+    const stream = videoRef.current?.srcObject as MediaStream | null;
+
+    stream?.getTracks().forEach((track) => track.stop());
+  }
+
+  async function submitManualBarcode() {
+    if (!manualBarcode.trim()) return;
+
+    stopCamera();
+
+    await lookupBarcode(manualBarcode.trim());
+  }
+
   useEffect(() => {
+    if (manualMode) return;
+
     if (!videoRef.current) return;
 
     const hints = new Map<DecodeHintType, unknown>();
@@ -57,38 +98,15 @@ export default function BarcodeScanner({
             if (!result || foundRef.current) return;
 
             foundRef.current = true;
+
             setFound(true);
 
             const barcode = result.getText();
 
             setTimeout(async () => {
-              controlsRef.current?.stop();
+              stopCamera();
 
-              const stream = videoRef.current?.srcObject as MediaStream | null;
-              stream?.getTracks().forEach((track) => track.stop());
-
-              try {
-                const res = await fetch(
-                  `https://world.openfoodfacts.org/api/v3/product/${barcode}?fields=product_name,nutriments,brands,image_front_url`,
-                );
-
-                const data = await res.json();
-
-                if (data.status === "success") {
-                  onProductFound(barcode, data.product);
-                  onClose();
-                } else {
-                  setError("Product not found");
-                  onProductNotFound(barcode);
-                  foundRef.current = false;
-                  setFound(false);
-                  onClose();
-                }
-              } catch {
-                setError("Lookup failed");
-                foundRef.current = false;
-                setFound(false);
-              }
+              await lookupBarcode(barcode);
             }, 500);
           },
         );
@@ -104,39 +122,77 @@ export default function BarcodeScanner({
     start();
 
     return () => {
-      controlsRef.current?.stop();
-
-      const stream = videoRef.current?.srcObject as MediaStream | null;
-      stream?.getTracks().forEach((track) => track.stop());
+      stopCamera();
     };
-  }, []);
+  }, [manualMode]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      {!manualMode && (
+        <>
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover"
+          />
 
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className={`w-72 h-40 rounded-xl border-4 transition-all duration-300 ${
-            found
-              ? "border-green-400 bg-green-400/20 scale-105"
-              : "border-white"
-          }`}
-        />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              className={`w-72 h-40 rounded-xl border-4 transition-all duration-300 ${
+                found
+                  ? "border-green-400 bg-green-400/20 scale-105"
+                  : "border-white"
+              }`}
+            />
+          </div>
+        </>
+      )}
+
+      {manualMode && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-[350px] rounded-2xl bg-[#131313] p-6 space-y-4">
+            <h2 className="text-xl font-black text-white">Enter barcode</h2>
+
+            <input
+              autoFocus
+              type="text"
+              inputMode="numeric"
+              value={manualBarcode}
+              onChange={(e) => setManualBarcode(e.target.value)}
+              placeholder="Barcode number"
+              className="w-full rounded-lg bg-neutral-800 p-3 text-white"
+            />
+
+            <button
+              onClick={submitManualBarcode}
+              className="w-full rounded-lg bg-blue-600 py-3 text-white"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2 gap-3">
+        <button
+          onClick={() => {
+            stopCamera();
+            setManualMode(true);
+          }}
+          className="rounded bg-white px-6 py-3 cursor-pointer"
+        >
+          Manual
+        </button>
+
+        <button
+          onClick={onClose}
+          className="rounded bg-white px-6 py-3 cursor-pointer"
+        >
+          Cancel
+        </button>
       </div>
-
-      <button
-        onClick={onClose}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 rounded bg-white px-6 py-3"
-      >
-        Cancel
-      </button>
 
       {error && (
         <div className="absolute top-8 left-1/2 -translate-x-1/2 rounded bg-red-500 px-4 py-2 text-white">

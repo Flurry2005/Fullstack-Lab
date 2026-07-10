@@ -144,10 +144,13 @@ function NutritionPanel() {
                   <h2 className="text-[#ADAAAA] text-xs">CARBS</h2>
 
                   <p className="text-[#F3FFCA] font-black text-sm">
-                    {today?.products?.reduce(
-                      (sum: number, item: any) => sum + item.carbohydratesGrams,
-                      0,
-                    ) ?? 0}
+                    {today?.products
+                      ?.reduce(
+                        (sum: number, item: any) =>
+                          sum + item.carbohydratesGrams,
+                        0,
+                      )
+                      .toFixed(0) ?? 0}
                     {"g "}
                   </p>
                 </article>
@@ -155,10 +158,12 @@ function NutritionPanel() {
                   <h2 className="text-[#ADAAAA] text-xs">FAT</h2>
 
                   <p className="text-[#F3FFCA] font-black text-sm">
-                    {today?.products?.reduce(
-                      (sum: number, item: any) => sum + item.fatsGrams,
-                      0,
-                    ) ?? 0}
+                    {today?.products
+                      ?.reduce(
+                        (sum: number, item: any) => sum + item.fatsGrams,
+                        0,
+                      )
+                      .toFixed(0) ?? 0}
                     {"g "}
                   </p>
                 </article>
@@ -166,10 +171,12 @@ function NutritionPanel() {
                   <h2 className="text-[#ADAAAA] text-xs">PROTEIN</h2>
 
                   <p className="text-[#F3FFCA] font-black text-sm">
-                    {today?.products?.reduce(
-                      (sum: number, item: any) => sum + item.proteinGrams,
-                      0,
-                    ) ?? 0}
+                    {today?.products
+                      ?.reduce(
+                        (sum: number, item: any) => sum + item.proteinGrams,
+                        0,
+                      )
+                      .toFixed(0) ?? 0}
                     {"g "}
                   </p>
                 </article>

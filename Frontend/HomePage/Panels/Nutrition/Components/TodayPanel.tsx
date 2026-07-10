@@ -45,7 +45,7 @@ export default function TodayPanel({
 
         <button
           onClick={() => setShowScanner(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 cursor-pointer"
         >
           Add product
         </button>
@@ -88,7 +88,7 @@ export default function TodayPanel({
                   </div>
                   {/* Nutrients */}
                   <div>
-                    {product.carbohydratesGrams && (
+                    {product.carbohydratesGrams >= 0 && (
                       <p className="text-sm text-gray-400">
                         Carbs: {product.carbohydratesGrams} g
                       </p>

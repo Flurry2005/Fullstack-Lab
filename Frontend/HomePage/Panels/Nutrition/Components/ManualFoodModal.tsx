@@ -18,22 +18,38 @@ export default function ManualFoodModal({
     productBrand: "",
     productImage: "",
 
-    quantityGrams: 100,
+    quantityGrams: "100",
 
-    caloriesPer100g: 0,
-    carbohydratesPer100g: 0,
-    fatsPer100g: 0,
-    proteinPer100g: 0,
+    caloriesPer100g: "",
+    carbohydratesPer100g: "",
+    fatsPer100g: "",
+    proteinPer100g: "",
   });
 
-  const calories = (form.caloriesPer100g * form.quantityGrams) / 100;
+  const toNumber = (value: string) => {
+    return Number(value) || 0;
+  };
+
+  const quantityGrams = toNumber(form.quantityGrams);
+
+  const calories = (toNumber(form.caloriesPer100g) * quantityGrams) / 100;
 
   const carbohydratesGrams =
-    (form.carbohydratesPer100g * form.quantityGrams) / 100;
+    (toNumber(form.carbohydratesPer100g) * quantityGrams) / 100;
 
-  const fatsGrams = (form.fatsPer100g * form.quantityGrams) / 100;
+  const fatsGrams = (toNumber(form.fatsPer100g) * quantityGrams) / 100;
 
-  const proteinGrams = (form.proteinPer100g * form.quantityGrams) / 100;
+  const proteinGrams = (toNumber(form.proteinPer100g) * quantityGrams) / 100;
+
+  function updateText(
+    key: "productName" | "productBrand" | "productImage",
+    value: string,
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
 
   function updateNumber(
     key:
@@ -46,7 +62,7 @@ export default function ManualFoodModal({
   ) {
     setForm((prev) => ({
       ...prev,
-      [key]: Number(value),
+      [key]: value,
     }));
   }
 
@@ -68,13 +84,13 @@ export default function ManualFoodModal({
           body: JSON.stringify({
             barcode,
 
-            productName: form.productName,
+            productName: form.productName || "Unknown",
 
             productBrand: form.productBrand,
 
             productImage: form.productImage,
 
-            quantityGrams: form.quantityGrams,
+            quantityGrams,
 
             calories,
 
@@ -93,7 +109,7 @@ export default function ManualFoodModal({
 
       onAdded();
     } catch (error) {
-      console.error(error);
+      console.error("Failed adding manual product:", error);
     } finally {
       setLoading(false);
     }
@@ -101,85 +117,90 @@ export default function ManualFoodModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="w-[420px] rounded-2xl bg-[#131313] p-6 space-y-4">
+      <div className="w-[420px] max-h-[90vh] overflow-y-auto rounded-2xl bg-[#131313] p-6 space-y-4">
         <h2 className="text-xl font-black text-white">Add product manually</h2>
 
         <input
           placeholder="Product name"
           value={form.productName}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              productName: e.target.value,
-            })
-          }
-          className="w-full rounded bg-neutral-800 p-3 text-white"
+          onChange={(e) => updateText("productName", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
         <input
           placeholder="Brand"
           value={form.productBrand}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              productBrand: e.target.value,
-            })
-          }
-          className="w-full rounded bg-neutral-800 p-3 text-white"
+          onChange={(e) => updateText("productBrand", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
         <input
           placeholder="Image URL"
           value={form.productImage}
-          onChange={(e) =>
-            setForm({
-              ...form,
-              productImage: e.target.value,
-            })
-          }
-          className="w-full rounded bg-neutral-800 p-3 text-white"
+          onChange={(e) => updateText("productImage", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
-        <label className="text-gray-400 text-sm">Quantity grams</label>
+        <div>
+          <label className="text-sm text-gray-400">Quantity grams</label>
+
+          <input
+            type="number"
+            min="0"
+            value={form.quantityGrams}
+            onChange={(e) => updateNumber("quantityGrams", e.target.value)}
+            className="w-full rounded-lg bg-neutral-800 p-3 text-white"
+          />
+        </div>
+
+        <p className="text-sm text-gray-400">Nutrition per 100g</p>
 
         <input
           type="number"
-          value={form.quantityGrams}
-          onChange={(e) => updateNumber("quantityGrams", e.target.value)}
-          className="w-full rounded bg-neutral-800 p-3 text-white"
+          placeholder="Calories per 100g"
+          value={form.caloriesPer100g}
+          onChange={(e) => updateNumber("caloriesPer100g", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
-        <p className="text-gray-400 text-sm">Nutrition per 100g</p>
+        <input
+          type="number"
+          placeholder="Carbs per 100g"
+          value={form.carbohydratesPer100g}
+          onChange={(e) => updateNumber("carbohydratesPer100g", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
+        />
 
-        {[
-          ["caloriesPer100g", "Calories"],
-          ["carbohydratesPer100g", "Carbs"],
-          ["fatsPer100g", "Fat"],
-          ["proteinPer100g", "Protein"],
-        ].map(([key, label]) => (
-          <input
-            key={key}
-            type="number"
-            placeholder={`${label} per 100g`}
-            value={form[key as keyof typeof form]}
-            onChange={(e) =>
-              updateNumber(key as keyof typeof form, e.target.value)
-            }
-            className="w-full rounded bg-neutral-800 p-3 text-white"
-          />
-        ))}
+        <input
+          type="number"
+          placeholder="Fat per 100g"
+          value={form.fatsPer100g}
+          onChange={(e) => updateNumber("fatsPer100g", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
+        />
 
-        <div className="text-white space-y-1">
+        <input
+          type="number"
+          placeholder="Protein per 100g"
+          value={form.proteinPer100g}
+          onChange={(e) => updateNumber("proteinPer100g", e.target.value)}
+          className="w-full rounded-lg bg-neutral-800 p-3 text-white"
+        />
+
+        <div className="space-y-1 text-white">
           <p>Calories: {calories.toFixed(0)} kcal</p>
+
           <p>Carbs: {carbohydratesGrams.toFixed(1)} g</p>
+
           <p>Fat: {fatsGrams.toFixed(1)} g</p>
+
           <p>Protein: {proteinGrams.toFixed(1)} g</p>
         </div>
 
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="rounded bg-neutral-700 px-4 py-2 text-white"
+            className="rounded-lg bg-neutral-700 px-4 py-2 text-white"
           >
             Cancel
           </button>
@@ -187,7 +208,7 @@ export default function ManualFoodModal({
           <button
             disabled={loading}
             onClick={addProduct}
-            className="rounded bg-blue-600 px-4 py-2 text-white"
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
             {loading ? "Adding..." : "Add"}
           </button>
