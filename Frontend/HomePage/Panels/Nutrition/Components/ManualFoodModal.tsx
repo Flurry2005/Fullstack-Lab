@@ -20,10 +20,10 @@ export default function ManualFoodModal({
 
     quantityGrams: "100",
 
-    caloriesPer100g: "",
-    carbohydratesPer100g: "",
-    fatsPer100g: "",
-    proteinPer100g: "",
+    caloriesPer100g: "0",
+    carbohydratesPer100g: "0",
+    fatsPer100g: "0",
+    proteinPer100g: "0",
   });
 
   const toNumber = (value: string) => {
@@ -145,10 +145,17 @@ export default function ManualFoodModal({
           <label className="text-sm text-gray-400">Quantity grams</label>
 
           <input
-            type="number"
-            min="0"
+            placeholder="Quantity grams"
+            type="text"
+            inputMode="numeric"
             value={form.quantityGrams}
-            onChange={(e) => updateNumber("quantityGrams", e.target.value)}
+            onChange={(e) =>
+              updateNumber(
+                "quantityGrams",
+                e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "") ||
+                  "0",
+              )
+            }
             className="w-full rounded-lg bg-neutral-800 p-3 text-white"
           />
         </div>
@@ -156,34 +163,58 @@ export default function ManualFoodModal({
         <p className="text-sm text-gray-400">Nutrition per 100g</p>
 
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="Calories per 100g"
           value={form.caloriesPer100g}
-          onChange={(e) => updateNumber("caloriesPer100g", e.target.value)}
+          onChange={(e) =>
+            updateNumber(
+              "caloriesPer100g",
+              e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "") || "0",
+            )
+          }
           className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="Carbs per 100g"
           value={form.carbohydratesPer100g}
-          onChange={(e) => updateNumber("carbohydratesPer100g", e.target.value)}
+          onChange={(e) =>
+            updateNumber(
+              "carbohydratesPer100g",
+              e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "") || "0",
+            )
+          }
           className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="Fat per 100g"
           value={form.fatsPer100g}
-          onChange={(e) => updateNumber("fatsPer100g", e.target.value)}
+          onChange={(e) =>
+            updateNumber(
+              "fatsPer100g",
+              e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "") || "0",
+            )
+          }
           className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="Protein per 100g"
           value={form.proteinPer100g}
-          onChange={(e) => updateNumber("proteinPer100g", e.target.value)}
+          onChange={(e) =>
+            updateNumber(
+              "proteinPer100g",
+              e.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "") || "0",
+            )
+          }
           className="w-full rounded-lg bg-neutral-800 p-3 text-white"
         />
 
