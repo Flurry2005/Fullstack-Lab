@@ -20,10 +20,10 @@ export default function ManualFoodModal({
 
     quantityGrams: "100",
 
-    caloriesPer100g: "0",
-    carbohydratesPer100g: "0",
-    fatsPer100g: "0",
-    proteinPer100g: "0",
+    caloriesPer100g: "",
+    carbohydratesPer100g: "",
+    fatsPer100g: "",
+    proteinPer100g: "",
   });
 
   const toNumber = (value: string) => {
