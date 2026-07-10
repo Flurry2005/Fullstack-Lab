@@ -192,16 +192,17 @@ router.get(
   refreshTokenWithingsMiddleware.checkToken,
   async (req, res) => {
     try {
+      let date = String(req.query.date);
       const user = await userModel.findById({ _id: res.locals.jwt.userId });
 
       const accessToken = user?.withings?.accessToken;
 
-      const today = new Date().toISOString().split("T")[0];
+      if (!req.query.date) date = new Date().toISOString().split("T")[0];
 
       const body = new URLSearchParams({
         action: "getactivity",
-        startdateymd: today,
-        enddateymd: today,
+        startdateymd: date,
+        enddateymd: date,
         data_fields: "steps,calories,totalcalories,distance",
       });
 
@@ -223,7 +224,7 @@ router.get(
       const activity = data.body.activities?.[0] ?? {};
 
       res.json({
-        date: today,
+        date: date,
         steps: activity.steps ?? 0,
         activeCalories: activity.calories ?? 0,
         totalCalories: activity.totalcalories ?? 0,

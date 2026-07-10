@@ -1,14 +1,17 @@
 import { Footprints, Road, WavesVertical } from "lucide-react";
-import React, { act, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 function DailyEnergyExpenditure() {
   const [activityData, setActivityData] = useState<null | any>(null);
 
   const getData = async () => {
+    const now = new Date();
+    const todayDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const res = await fetch(
       import.meta.env.DEV
-        ? "http://192.168.1.201:3000/api/withings/activity"
-        : "https://api.kineticedge.liamjorgensen.dev/api/withings/activity",
+        ? "http://192.168.1.201:3000/api/withings/activity?date=" + todayDate
+        : "https://api.kineticedge.liamjorgensen.dev/api/withings/activity?date=" +
+            todayDate,
       { credentials: "include" },
     );
     const data = await res.json();

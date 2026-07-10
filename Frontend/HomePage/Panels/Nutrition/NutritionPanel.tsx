@@ -23,6 +23,21 @@ function NutritionPanel() {
     product: Product;
   } | null>(null);
 
+  const [activityData, setActivityData] = useState<null | any>(null);
+
+  const getActivityData = async (date: string) => {
+    const res = await fetch(
+      import.meta.env.DEV
+        ? "http://192.168.1.201:3000/api/withings/activity?date=" + date
+        : "https://api.kineticedge.liamjorgensen.dev/api/withings/activity?date=" +
+            date,
+      { credentials: "include" },
+    );
+    const data = await res.json();
+    console.log(data);
+    setActivityData(data);
+  };
+
   const fetchData = async () => {
     const response = await fetch(
       import.meta.env.DEV
@@ -50,10 +65,12 @@ function NutritionPanel() {
       };
     }
 
-    const todayDate = new Date().toISOString().split("T")[0];
+    const now = new Date();
+    const todayDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    getActivityData(todayDate);
 
     return {
-      today: foodIntake.days.find((day: any) => day.date === todayDate),
+      today: foodIntake.days.find((day: any) => day.date === todayDate) || {},
 
       past: foodIntake.days.filter((day: any) => day.date !== todayDate),
     };
@@ -128,16 +145,54 @@ function NutritionPanel() {
 
               <div className="flex gap-5">
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center">
+                  <h2 className="text-[#ADAAAA] text-xs">EXPENDITURE</h2>
+
+                  <p className="text-[#F3FFCA] font-black text-sm">
+                    {activityData === null
+                      ? "Loading..."
+                      : activityData!.totalCalories!.toFixed(0) + " KCAL"}{" "}
+                  </p>
+                </article>
+                <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center">
                   <h2 className="text-[#ADAAAA] text-xs">INTAKE</h2>
 
                   <p className="text-[#F3FFCA] font-black text-sm">
-                    {today?.products
-                      ?.reduce(
-                        (sum: number, item: any) => sum + item.calories,
-                        0,
-                      )
-                      .toFixed(0) ?? 0}{" "}
-                    KCAL
+                    {today
+                      ? (today?.products
+                          ?.reduce(
+                            (sum: number, item: any) => sum + item.calories,
+                            0,
+                          )
+                          .toFixed(0) ?? 0) + " KCAL"
+                      : "Loading..."}{" "}
+                  </p>
+                </article>
+                <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center">
+                  <h2 className="text-[#ADAAAA] text-xs">
+                    {activityData === null
+                      ? "Loading..."
+                      : activityData!.totalCalories! -
+                            (today?.products
+                              ?.reduce(
+                                (sum: number, item: any) => sum + item.calories,
+                                0,
+                              )
+                              .toFixed(0) ?? 0) >
+                          0
+                        ? "DEFICIT"
+                        : "SURPLUS"}
+                  </h2>
+
+                  <p className="text-[#F3FFCA] font-black text-sm">
+                    {activityData === null
+                      ? "Loading..."
+                      : Math.abs(
+                          activityData!.totalCalories! -
+                            (today?.products?.reduce(
+                              (sum: number, item: any) => sum + item.calories,
+                              0,
+                            ) ?? 0),
+                        ).toFixed(0) + " KCAL"}{" "}
                   </p>
                 </article>
                 <article className="h-20 w-30 bg-[#131313] rounded-2xl flex flex-col p-4 justify-center">
