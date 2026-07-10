@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import IntensityPanel from "./Components/IntensityPanel";
 import DailyEnergyExpenditure from "./Components/DailyEnergyExpenditure";
+import BarcodeScanner from "../../../utils/BarcodeScanner";
 
 function DashboardPanel() {
   const { sessions } = useSessions();
@@ -135,6 +136,7 @@ function DashboardPanel() {
           </article>
           <DailyEnergyExpenditure />
         </section>
+        <BarcodeScanner />
       </main>
     </div>
   );
