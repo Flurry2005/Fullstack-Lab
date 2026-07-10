@@ -103,4 +103,33 @@ router.post(
   },
 );
 
+router.get(
+  "/get-all-foodIntake",
+  jwtMiddleware.jwtTokenIsValid,
+  async (req, res) => {
+    try {
+      const userId = res.locals.jwt.userId;
+
+      const foodIntake = await foodInTakeModel.findOne({
+        userId,
+      });
+
+      if (!foodIntake) {
+        return res.status(200).json({
+          userId,
+          days: [],
+        });
+      }
+
+      res.status(200).json(foodIntake);
+    } catch (error) {
+      console.error("Get food intake error:", error);
+
+      res.status(500).json({
+        message: "Server error",
+      });
+    }
+  },
+);
+
 export default router;

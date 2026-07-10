@@ -2,8 +2,8 @@ import NavBar from "../../../NavBar";
 import GlowingButton from "../../../Components/General/GlowingButton";
 import { useEffect, useMemo, useState, type JSX } from "react";
 import TodayPanel from "./Components/TodayPanel";
-import AddFoodModal from "./Components/AddFoodModal";
 import type { Product } from "../../../utils/BarcodeScanner";
+import AddFoodModal from "./Components/AddFoodModal";
 
 export const Panel = {
   PAST: "PAST",
@@ -28,6 +28,9 @@ function NutritionPanel() {
       import.meta.env.DEV
         ? "http://192.168.1.201:3000/get-all-foodIntake"
         : "https://api.kineticedge.liamjorgensen.dev/get-all-foodIntake",
+      {
+        credentials: "include",
+      },
     );
 
     const data = await response.json();
