@@ -6,6 +6,7 @@ type Product = {
   product_name?: string;
   brands?: string;
   image_front_url?: string;
+  nutriments: any;
 };
 
 export default function BarcodeScanner() {
@@ -78,7 +79,7 @@ export default function BarcodeScanner() {
 
               try {
                 const res = await fetch(
-                  `https://world.openfoodfacts.org/api/v2/product/${code}.json`,
+                  `https://world.openfoodfacts.org/api/v2/product/${code}?fields=product_name,nutrition,brands,image_front_url`,
                 );
 
                 const data = await res.json();
@@ -138,6 +139,24 @@ export default function BarcodeScanner() {
           Scan barcode
         </button>
       )}
+      <button
+        className="
+      bg-white rounded-2xl px-2 py-1"
+        onClick={async () => {
+          const res = await fetch(
+            `https://world.openfoodfacts.org/api/v3/product/7318690081487?fields=product_name,nutrition,brands,image_front_url`,
+          );
+          const data = await res.json();
+
+          if (data.status === "success") {
+            setProduct(data.product);
+          } else {
+            setError("Product not found");
+          }
+        }}
+      >
+        Test
+      </button>
 
       {scanning && (
         <div className="fixed inset-0 bg-black z-50">
@@ -191,6 +210,31 @@ export default function BarcodeScanner() {
           {product.image_front_url && (
             <img src={product.image_front_url} className="w-48 mx-auto" />
           )}
+          {product.nutriments &&
+            Object.entries(product.nutriments)
+              .filter(([key]) =>
+                [
+                  "energy-kcal_100g",
+                  "carbohydrates_100g",
+                  "fat_100g",
+                  "proteins_100g",
+                ].includes(key),
+              )
+              .map(([key, value]) => {
+                const labels: Record<string, string> = {
+                  "energy-kcal_100g": "Calories",
+                  carbohydrates_100g: "Carbs",
+                  fat_100g: "Fat",
+                  proteins_100g: "Protein",
+                };
+
+                return (
+                  <p className="text-white" key={key}>
+                    {labels[key]}: {value}
+                    {key === "energy-kcal_100g" ? " kcal" : " g"}
+                  </p>
+                );
+              })}
         </div>
       )}
     </div>
