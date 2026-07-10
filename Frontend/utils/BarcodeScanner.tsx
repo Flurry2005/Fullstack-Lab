@@ -176,15 +176,17 @@ export default function BarcodeScanner() {
         </div>
       )}
 
-      <p>Barcode: {barcode || "Not scanned"}</p>
+      <p className="text-white">Barcode: {barcode || "Not scanned"}</p>
 
       {error && <p className="text-red-500">{error}</p>}
 
       {product && (
         <div className="text-center">
-          <h2 className="text-xl font-bold">{product.product_name}</h2>
+          <h2 className="text-xl font-bold text-white">
+            {product.product_name}
+          </h2>
 
-          <p>{product.brands}</p>
+          <p className="text-white">{product.brands}</p>
 
           {product.image_front_url && (
             <img src={product.image_front_url} className="w-48 mx-auto" />
