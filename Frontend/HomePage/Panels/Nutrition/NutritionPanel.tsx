@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type JSX } from "react";
 import TodayPanel from "./Components/TodayPanel";
 import type { Product } from "../../../utils/BarcodeScanner";
 import AddFoodModal from "./Components/AddFoodModal";
-
+import ManualFoodModal from "./Components/ManualFoodModal";
 export const Panel = {
   PAST: "PAST",
   TODAY: "UPCOMMING",
@@ -15,7 +15,7 @@ export type ActivePanel = (typeof Panel)[keyof typeof Panel];
 
 function NutritionPanel() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(Panel.TODAY);
-
+  const [manualBarcode, setManualBarcode] = useState<string | null>(null);
   const [foodIntake, setFoodIntake] = useState<any | null>(null);
 
   const [selectedProduct, setSelectedProduct] = useState<{
@@ -72,6 +72,9 @@ function NutritionPanel() {
               product,
             });
           }}
+          onProductNotFound={(barcode) => {
+            setManualBarcode(barcode);
+          }}
           updateFoods={fetchData}
         />
       );
@@ -92,6 +95,9 @@ function NutritionPanel() {
               barcode,
               product,
             });
+          }}
+          onProductNotFound={(barcode) => {
+            setManualBarcode(barcode);
           }}
           updateFoods={fetchData}
         />
@@ -219,6 +225,16 @@ function NutritionPanel() {
               await fetchData();
 
               setSelectedProduct(null);
+            }}
+          />
+        )}
+        {manualBarcode && (
+          <ManualFoodModal
+            barcode={manualBarcode}
+            onClose={() => setManualBarcode(null)}
+            onAdded={async () => {
+              await fetchData();
+              setManualBarcode(null);
             }}
           />
         )}

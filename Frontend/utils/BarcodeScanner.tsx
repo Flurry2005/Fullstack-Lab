@@ -12,11 +12,13 @@ export type Product = {
 interface BarcodeScannerProps {
   onClose: () => void;
   onProductFound: (barcode: string, product: Product) => void;
+  onProductNotFound: (barcode: string) => void;
 }
 
 export default function BarcodeScanner({
   onClose,
   onProductFound,
+  onProductNotFound,
 }: BarcodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
@@ -77,8 +79,10 @@ export default function BarcodeScanner({
                   onClose();
                 } else {
                   setError("Product not found");
+                  onProductNotFound(barcode);
                   foundRef.current = false;
                   setFound(false);
+                  onClose();
                 }
               } catch {
                 setError("Lookup failed");

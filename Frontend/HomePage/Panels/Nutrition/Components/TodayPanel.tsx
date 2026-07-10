@@ -5,12 +5,14 @@ import type { Product } from "../../../../utils/BarcodeScanner";
 interface TodayPanelProps {
   foodIntakeToday: any;
   onProductFound: (barcode: string, product: Product) => void;
+  onProductNotFound: (barcode: string) => void;
   updateFoods: any;
 }
 
 export default function TodayPanel({
   foodIntakeToday,
   onProductFound,
+  onProductNotFound,
   updateFoods,
 }: TodayPanelProps) {
   const [showScanner, setShowScanner] = useState(false);
@@ -120,6 +122,11 @@ export default function TodayPanel({
             setShowScanner(false);
 
             onProductFound(barcode, product);
+          }}
+          onProductNotFound={(barcode) => {
+            setShowScanner(false);
+
+            onProductNotFound(barcode);
           }}
         />
       )}
