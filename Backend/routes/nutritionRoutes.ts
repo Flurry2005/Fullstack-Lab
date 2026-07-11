@@ -1,8 +1,80 @@
 import express from "express";
 import { jwtMiddleware } from "../middleware/jwtMiddleware.js";
 import foodInTakeModel from "../models/foodInTakeModel.js";
+import FoodDBCache from "../models/FoodDBCache.js";
+import { Types } from "mongoose";
 
 export const router = express.Router();
+
+router.get("/barcode", jwtMiddleware.jwtTokenIsValid, async (req, res) => {
+  const barcode = Number(req.query.barcode);
+
+  const foodData = await FoodDBCache.findOne({ barcode: barcode });
+
+  if (foodData) return res.status(200).json(foodData.data);
+  else {
+    console.log("Barcode not found in cache, fetching...");
+    const response = await fetch(
+      `https://world.openfoodfacts.org/api/v3/product/${barcode}?fields=product_name,nutriments,brands,image_front_url`,
+    );
+
+    const data = await response.json();
+    if (data.status === "success") {
+      await FoodDBCache.insertOne({ barcode, data });
+      return res.status(200).json(data);
+    } else {
+      const previousProduct = await foodInTakeModel.aggregate([
+        {
+          $match: {
+            userId: new Types.ObjectId(res.locals.jwt.userId),
+          },
+        },
+        {
+          $unwind: "$days",
+        },
+        {
+          $unwind: "$days.products",
+        },
+        {
+          $match: {
+            "days.products.barcode": barcode,
+          },
+        },
+        {
+          $replaceRoot: {
+            newRoot: "$days.products",
+          },
+        },
+        {
+          $limit: 1,
+        },
+      ]);
+      console.log(previousProduct);
+      const product = previousProduct[0] ?? null;
+
+      if (product) {
+        const response = {
+          status: "success",
+          product: {
+            product_name: product.productName,
+            brands: product.productBrand,
+            image_front_url: product.productImage,
+            nutriments: {
+              "energy-kcal_100g": product.caloriesPer100g,
+              carbohydrates_100g: product.carbohydratesPer100g,
+              fat_100g: product.fatsPer100g,
+              proteins_100g: product.proteinPer100g,
+            },
+          },
+        };
+
+        return res.status(200).json(response);
+      }
+
+      return res.status(404).json(data);
+    }
+  }
+});
 
 router.post(
   "/add-food-product",
@@ -18,6 +90,11 @@ router.post(
         productImage,
 
         quantityGrams,
+
+        caloriesPer100g,
+        carbohydratesPer100g,
+        fatsPer100g,
+        proteinPer100g,
 
         calories,
         carbohydratesGrams,
@@ -78,12 +155,14 @@ router.post(
 
         quantityGrams,
 
+        caloriesPer100g,
+        carbohydratesPer100g,
+        fatsPer100g,
+        proteinPer100g,
+
         calories,
-
         carbohydratesGrams,
-
         fatsGrams,
-
         proteinGrams,
       });
 

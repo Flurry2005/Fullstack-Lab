@@ -85,19 +85,19 @@ export default function ManualFoodModal({
             barcode,
 
             productName: form.productName || "Unknown",
-
             productBrand: form.productBrand,
-
             productImage: form.productImage,
 
             quantityGrams,
 
+            caloriesPer100g: toNumber(form.caloriesPer100g),
+            carbohydratesPer100g: toNumber(form.carbohydratesPer100g),
+            fatsPer100g: toNumber(form.fatsPer100g),
+            proteinPer100g: toNumber(form.proteinPer100g),
+
             calories,
-
             carbohydratesGrams,
-
             fatsGrams,
-
             proteinGrams,
           }),
         },

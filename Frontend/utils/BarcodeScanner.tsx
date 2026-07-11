@@ -33,7 +33,13 @@ export default function BarcodeScanner({
   async function lookupBarcode(barcode: string) {
     try {
       const res = await fetch(
-        `https://world.openfoodfacts.org/api/v3/product/${barcode}?fields=product_name,nutriments,brands,image_front_url`,
+        import.meta.env.DEV
+          ? `http://192.168.1.201:3000/barcode?barcode=` + barcode
+          : `https://api.kineticedge.liamjorgensen.dev/barcode?barcode=` +
+              barcode,
+        {
+          credentials: "include",
+        },
       );
 
       const data = await res.json();
