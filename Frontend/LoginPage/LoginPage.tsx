@@ -110,7 +110,7 @@ function LoginPage() {
                       id="fullname"
                       name="fullname"
                       required={true}
-                      additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
+                      additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-[16px]"
                     ></InputField>
                   </div>
                   <div className="flex flex-col">
@@ -125,7 +125,7 @@ function LoginPage() {
                       id="username"
                       name="username"
                       required={true}
-                      additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
+                      additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-[16px]"
                     ></InputField>
                   </div>
                 </>
@@ -139,7 +139,7 @@ function LoginPage() {
                   id="email"
                   name="email"
                   required={true}
-                  additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-xs"
+                  additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs text-white text-[16px]"
                 ></InputField>
               </div>
               <div className="flex flex-col">
@@ -154,7 +154,7 @@ function LoginPage() {
                   required={true}
                   id="password"
                   type="password"
-                  additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs  text-white text-xs"
+                  additionalClasses="bg-[#1A1A1A] rounded! border-0 h-10 w-full placeholder:text-[#ADAAAA]/60 placeholder:text-xs  text-white text-[16px]"
                 ></InputField>
               </div>
               <p
