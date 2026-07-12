@@ -238,7 +238,7 @@ router.delete(
 
       // Remove the day if there are no products left
       if (dayEntry.products.length === 0) {
-        foodIntake.days = foodIntake.days.filter((day) => day.date !== date);
+        foodIntake.days.pull(dayEntry._id);
       }
 
       await foodIntake.save();
